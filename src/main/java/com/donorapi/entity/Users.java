@@ -25,8 +25,8 @@ public class Users implements UserDetails {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer userId;
     private String username;
-    private String phone;
     private String password;
+    @Enumerated(EnumType.STRING)
     private UserRoles roles;
 
     private LocalDateTime createdAt;
