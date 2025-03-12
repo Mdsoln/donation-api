@@ -7,4 +7,11 @@ import lombok.EqualsAndHashCode;
 @Data
 public class EmailExistsException extends RuntimeException {
     private final String errorCode;
+    private final String message;
+
+    public EmailExistsException(String errorCode, String message) {
+        super(message);
+        this.errorCode = errorCode;
+        this.message = message;
+    }
 }

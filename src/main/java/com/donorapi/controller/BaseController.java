@@ -1,6 +1,5 @@
 package com.donorapi.controller;
 
-import com.donorapi.entity.Donor;
 import com.donorapi.models.DonorRegistrationRequest;
 import com.donorapi.models.DonorResponse;
 import com.donorapi.models.HospitalRegistrationRequest;
@@ -15,7 +14,6 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping(path = "/api/v1/donorapp")
 @RequiredArgsConstructor
 @Log4j2
-//@CrossOrigin(originPatterns = )
 public class BaseController {
 
     private final BaseService baseService;

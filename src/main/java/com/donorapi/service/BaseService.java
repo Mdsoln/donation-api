@@ -5,6 +5,7 @@ import com.donorapi.entity.Hospital;
 import com.donorapi.entity.UserRoles;
 import com.donorapi.entity.Users;
 import com.donorapi.exception.EmailExistsException;
+import com.donorapi.exception.HospitalFoundException;
 import com.donorapi.jpa.DonorRepository;
 import com.donorapi.jpa.HospitalRepository;
 import com.donorapi.jpa.UserRepository;
@@ -33,7 +34,7 @@ public class BaseService {
     public ResponseEntity<DonorResponse> registerDonor(DonorRegistrationRequest donorRequest) {
 
         donorRepository.findByEmail(donorRequest.getEmail()).ifPresent(donor -> {
-            throw new EmailExistsException("Donor already exists");
+            throw new EmailExistsException("EMAIL_ALREADY_EXISTS", "A donor with this email already exists.");
         });
         Users user = new Users();
         user.setUsername(donorRequest.getEmail());
@@ -54,7 +55,7 @@ public class BaseService {
     public ResponseEntity<HospitalResponse> registerHospital(HospitalRegistrationRequest hospitalRequest) {
 
         hospitalRepository.findByHospitalName(hospitalRequest.getHospitalName()).ifPresent(hospital -> {
-            throw new EmailExistsException("Hospital already exists");
+            throw new HospitalFoundException("Hospital already exists");
         });
         Users user = new Users();
         user.setUsername(hospitalRequest.getHospitalName());
