@@ -9,10 +9,8 @@ import com.donorapi.exception.HospitalFoundException;
 import com.donorapi.jpa.DonorRepository;
 import com.donorapi.jpa.HospitalRepository;
 import com.donorapi.jpa.UserRepository;
-import com.donorapi.models.DonorRegistrationRequest;
-import com.donorapi.models.DonorResponse;
-import com.donorapi.models.HospitalRegistrationRequest;
-import com.donorapi.models.HospitalResponse;
+import com.donorapi.jwt.service.JwtService;
+import com.donorapi.models.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.HttpStatus;
@@ -30,6 +28,7 @@ public class BaseService {
     private final DonorRepository donorRepository;
     private final HospitalRepository hospitalRepository;
     private final PasswordEncoder passwordEncoder;
+    private final JwtService jwtService;
 
     public ResponseEntity<DonorResponse> registerDonor(DonorRegistrationRequest donorRequest) {
 
@@ -73,5 +72,46 @@ public class BaseService {
                 new HospitalResponse(hospital.getHospitalId(), hospital.getHospitalName(), hospital.getHospitalAddress(),
                         hospital.getHospitalCity()), HttpStatus.CREATED
         );
+    }
+
+    public ResponseEntity<AuthResponse> authenticateUser(AuthRequest request){
+        return userRepository.findByUsername(request.getUsername())
+                .map(user -> {
+                    if (!passwordEncoder.matches(request.getPassword(),user.getPassword())) {
+                        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                                .body(new AuthResponse("Invalid credentials", null, null, null, null, null,null));
+                    }
+                    //Donor
+                    Donor donor = donorRepository.findByUser(user).orElse(null);
+                    //Hospital
+                    Hospital hospital = hospitalRepository.findByUser(user).orElse(null);
+
+                    var token = jwtService.generateToken(user);
+
+                    AuthResponse.AuthResponseBuilder response = AuthResponse.builder()
+                            .message("Successfully logged in")
+                            .token(token)
+                            .username(user.getUsername())
+                            .roles(user.getRoles().name());
+
+                    if(donor != null){
+                        response.email(donor.getEmail())
+                                .phone(donor.getPhone());
+                    }else if(hospital != null){
+                        response.email(hospital.getHospitalName())
+                                .hospital(
+                                        HospitalResponse.builder()
+                                                .hospitalName(hospital.getHospitalName())
+                                                .hospitalAddress(hospital.getHospitalAddress())
+                                                .hospitalCity(hospital.getHospitalCity())
+                                                .build()
+                                );
+                    }
+
+                    return ResponseEntity.ok(response.build());
+                })
+                .orElse(ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                        .body(new AuthResponse("User not found", null, null, null, null, null,null))
+                );
     }
 }

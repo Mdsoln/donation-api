@@ -1,9 +1,6 @@
 package com.donorapi.controller;
 
-import com.donorapi.models.DonorRegistrationRequest;
-import com.donorapi.models.DonorResponse;
-import com.donorapi.models.HospitalRegistrationRequest;
-import com.donorapi.models.HospitalResponse;
+import com.donorapi.models.*;
 import com.donorapi.service.BaseService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -27,4 +24,14 @@ public class BaseController {
     public ResponseEntity<HospitalResponse> registerHospital(@RequestBody HospitalRegistrationRequest hospitalRequest) {
         return baseService.registerHospital(hospitalRequest);
     }
+
+    @PostMapping("/login")
+    public ResponseEntity<AuthResponse> login(@RequestBody AuthRequest authRequest) {
+        if (authRequest == null || authRequest.getUsername() == null || authRequest.getUsername().trim().isEmpty()
+                || authRequest.getPassword() == null || authRequest.getPassword().trim().isEmpty()) {
+               throw new NullPointerException("Username and password are required");
+        }
+        return baseService.authenticateUser(authRequest);
+    }
+
 }
