@@ -1,4 +1,4 @@
-package com.donorapi.entity;
+package com.donorapi.constants;
 
 public enum UserRoles {
    DONOR, HOSPITAL, ADMINISTRATOR

@@ -3,6 +3,7 @@ package com.donorapi.handler;
 import com.donorapi.exception.EmailExistsException;
 import com.donorapi.exception.ErrorResponse;
 import com.donorapi.exception.HospitalFoundException;
+import com.donorapi.exception.OverBookingException;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -37,6 +38,14 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(NullPointerException.class)
     public ResponseEntity<ErrorResponse> handleNullPointerException(NullPointerException ex) {
+        ErrorResponse errorResponse = new ErrorResponse(ex.getMessage(), ex.getMessage());
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(errorResponse);
+    }
+
+    @ExceptionHandler(OverBookingException.class)
+    public ResponseEntity<ErrorResponse> handleNullPointerException(OverBookingException ex) {
         ErrorResponse errorResponse = new ErrorResponse(ex.getMessage(), ex.getMessage());
         return ResponseEntity
                 .status(HttpStatus.BAD_REQUEST)

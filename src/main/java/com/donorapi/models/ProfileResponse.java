@@ -9,8 +9,6 @@ import lombok.Setter;
 @AllArgsConstructor
 @Setter
 @Getter
-public class DonorRegistrationRequest extends UserRegistrationRequest{
-    private String fullName;
-    private String email;
-    private String phone;
+public class ProfileResponse {
+
 }

@@ -2,7 +2,7 @@ package com.donorapi.service;
 
 import com.donorapi.entity.Donor;
 import com.donorapi.entity.Hospital;
-import com.donorapi.entity.UserRoles;
+import com.donorapi.constants.UserRoles;
 import com.donorapi.entity.Users;
 import com.donorapi.exception.EmailExistsException;
 import com.donorapi.exception.HospitalFoundException;
@@ -43,6 +43,7 @@ public class BaseService {
 
         Donor donor = new Donor();
         donor.setUser(user);
+        donor.setFullName(donorRequest.getFullName());
         donor.setEmail(donorRequest.getEmail());
         donor.setPhone(donorRequest.getPhone());
         donorRepository.save(donor);
@@ -114,4 +115,19 @@ public class BaseService {
                         .body(new AuthResponse("User not found", null, null, null, null, null,null))
                 );
     }
+
+    public ResponseEntity<ProfileResponse> updateProfile(Integer donorId, ProfileRequest request){
+        return donorRepository.findByDonorId(donorId).map(donor -> {
+            donor.setFullName(request.getFullName());
+            donor.setPhone(request.getPhone());
+            donor.setEmail(request.getEmail());
+            donor.setBirthDate(request.getBirthdate());
+            donor.setHeight(request.getHeight());
+            donor.setWeight(request.getWeight());
+
+        })
+
+    }
+
+
 }

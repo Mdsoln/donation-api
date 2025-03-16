@@ -1,0 +1,52 @@
+package com.donorapi.entity;
+
+
+import com.donorapi.exception.OverBookingException;
+import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+
+import java.time.LocalDateTime;
+import java.util.List;
+
+import static org.springframework.http.HttpStatus.BAD_REQUEST;
+
+
+@Entity
+@Table(name = "slots")
+@NoArgsConstructor
+@AllArgsConstructor
+@Setter
+@Getter
+public class Slot {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Integer slotId;
+
+    @ManyToOne
+    @JoinColumn(name = "hospital_id", nullable = false)
+    private Hospital hospital;
+
+    @OneToMany(mappedBy = "slot", cascade = CascadeType.ALL)
+    private List<Appointment> appointments;
+
+    private int maxCapacity;  // Max donors (e.g., 5-10)
+    private int currentBookings = 0;
+    private LocalDateTime slotDateTime;
+    private boolean isBooked;
+
+    public boolean isAvailable() {
+        return currentBookings < maxCapacity;
+    }
+
+    public void addBooking() {
+        if (isAvailable()) {
+            this.currentBookings++;
+        } else {
+            throw new OverBookingException("Slot is fully booked!", BAD_REQUEST);
+        }
+    }
+}

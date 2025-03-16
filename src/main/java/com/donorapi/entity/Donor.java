@@ -6,7 +6,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @NoArgsConstructor
 @AllArgsConstructor
@@ -23,8 +25,21 @@ public class Donor {
     @JoinColumn(name = "user_id")
     private Users user;
 
+    @OneToMany(mappedBy = "donor", cascade = CascadeType.ALL)
+    private List<Appointment> appointments;
+
+    private String fullName;
     private String email;
     private String phone;
+    private String bloodType;
+    private double height;
+    private double weight;
+    private LocalDate birthDate;
+    private String gender;
+    private String image;
+    private String address;
+
+    @Column(updatable = false)
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 

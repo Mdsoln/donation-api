@@ -12,4 +12,6 @@ public interface DonorRepository extends JpaRepository<Donor, Integer> {
     Optional<Donor> findByEmail(String email);
 
     Optional<Donor> findByUser(Users user);
+
+   Optional<Donor> findByDonorId(Integer donorId);
 }
