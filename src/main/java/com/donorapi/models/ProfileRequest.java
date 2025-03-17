@@ -17,6 +17,7 @@ public class ProfileRequest {
     private String email;
     private String phone;
     private LocalDate birthdate;
+    private String gender;
     private double height;
     private double weight;
     private MultipartFile profileImage;

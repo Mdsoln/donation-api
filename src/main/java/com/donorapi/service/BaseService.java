@@ -11,12 +11,22 @@ import com.donorapi.jpa.HospitalRepository;
 import com.donorapi.jpa.UserRepository;
 import com.donorapi.jwt.service.JwtService;
 import com.donorapi.models.*;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
+import java.util.Objects;
 
 
 @Service
@@ -116,18 +126,59 @@ public class BaseService {
                 );
     }
 
-    public ResponseEntity<ProfileResponse> updateProfile(Integer donorId, ProfileRequest request){
-        return donorRepository.findByDonorId(donorId).map(donor -> {
-            donor.setFullName(request.getFullName());
-            donor.setPhone(request.getPhone());
-            donor.setEmail(request.getEmail());
-            donor.setBirthDate(request.getBirthdate());
-            donor.setHeight(request.getHeight());
-            donor.setWeight(request.getWeight());
+    public ResponseEntity<ProfileResponse> updateProfile(Integer donorId, ProfileRequest request) throws IOException{
+        Donor donor = donorRepository.findByDonorId(donorId)
+                .orElseThrow(() -> new EntityNotFoundException("Donor with ID " + donorId + " not found"));
 
-        })
+        if (request.getProfileImage() != null && !request.getProfileImage().isEmpty()) {
+            String imageName = storeImages(request.getProfileImage());
+            donor.setImage(imageName);
+        }
 
+        donor.setFullName(request.getFullName());
+        donor.setPhone(request.getPhone());
+        donor.setEmail(request.getEmail());
+        donor.setBirthDate(request.getBirthdate());
+        donor.setGender(request.getGender());
+        donor.setHeight(request.getHeight());
+        donor.setWeight(request.getWeight());
+        donorRepository.save(donor);
+
+        ProfileResponse response = ProfileResponse.builder()
+                .fullName(donor.getFullName())
+                .phone(donor.getPhone())
+                .email(donor.getEmail())
+                .weight(donor.getWeight())
+                .height(donor.getHeight())
+                .birthdate(donor.getBirthDate())
+                .gender(donor.getGender())
+                .build();
+
+        return ResponseEntity.ok(response);
     }
 
+
+    private String storeImages(MultipartFile image) throws IOException {
+       if (image == null || image.isEmpty()) {
+        throw new IllegalArgumentException("Image file is null or empty");
+       }
+
+       String uploadDirectory = "src/main/resources/static";
+       String imageName = StringUtils.cleanPath(Objects.requireNonNull(image.getOriginalFilename()));
+
+       if (imageName.contains("..")) {
+         throw new IllegalArgumentException("Invalid file format");
+       }
+
+       Path uploadPath = Paths.get(uploadDirectory);
+        if (!Files.exists(uploadPath)) {
+          Files.createDirectories(uploadPath);
+        }
+
+        Path filePath = uploadPath.resolve(imageName);
+          Files.copy(image.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
+
+          return imageName;
+    }
 
 }
