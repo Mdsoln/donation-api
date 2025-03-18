@@ -131,11 +131,12 @@ public class BaseService {
                 .orElseThrow(() -> new EntityNotFoundException("Donor with ID " + donorId + " not found"));
 
         if (request.getProfileImage() != null && !request.getProfileImage().isEmpty()) {
+            validateImageType(request.getProfileImage());
             String imageName = storeImages(request.getProfileImage());
             donor.setImage(imageName);
         }
 
-        donor.setFullName(request.getFullName());
+        donor.setFullName(request.getFullname());
         donor.setPhone(request.getPhone());
         donor.setEmail(request.getEmail());
         donor.setBirthDate(request.getBirthdate());
@@ -157,6 +158,15 @@ public class BaseService {
         return ResponseEntity.ok(response);
     }
 
+
+    private void validateImageType(MultipartFile image) {
+        String contentType = image.getContentType();
+        if (contentType == null || (!contentType.equals("image/png") &&
+                !contentType.equals("image/jpeg") &&
+                !contentType.equals("image/jpg"))) {
+            throw new IllegalArgumentException("Invalid image format. Only PNG, JPG, and JPEG are allowed.");
+        }
+    }
 
     private String storeImages(MultipartFile image) throws IOException {
        if (image == null || image.isEmpty()) {

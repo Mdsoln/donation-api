@@ -1,9 +1,6 @@
 package com.donorapi.models;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDate;
@@ -12,8 +9,9 @@ import java.time.LocalDate;
 @AllArgsConstructor
 @Setter
 @Getter
+@Builder
 public class ProfileRequest {
-    private String fullName;
+    private String fullname;
     private String email;
     private String phone;
     private LocalDate birthdate;
