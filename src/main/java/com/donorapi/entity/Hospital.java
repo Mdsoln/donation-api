@@ -24,5 +24,7 @@ public class Hospital {
     private String hospitalName;
     private String hospitalAddress;
     private String hospitalCity;
+    private Double latitude;
+    private Double longitude;
 
 }
