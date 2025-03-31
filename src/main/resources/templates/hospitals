@@ -1,0 +1,9 @@
+INSERT INTO hospitals (hospital_id, hospital_name, hospital_address, hospital_city) VALUES
+(2, 'Muhimbili National Hospital', 'United Nations Road, Upanga', 'Dar es Salaam'),
+(3, 'Aga Khan Hospital', 'Ocean Road, Kivukoni', 'Dar es Salaam'),
+(4, 'Tumaini Hospital', 'Ali Hassan Mwinyi Road, Kariakoo', 'Dar es Salaam'),
+(5, 'Mwananyamala Hospital', 'Mwananyamala Road, Kinondoni', 'Dar es Salaam'),
+(6, 'Temesek Hospital', 'Mbagala Rangi Tatu', 'Dar es Salaam');
+
+INSERT INTO hospitals(hospital_id, hospital_name, hospital_address, hospital_city) VALUES
+(7,'Amana Regional Hospital', 'Ilala', 'Dar es Salaam')
