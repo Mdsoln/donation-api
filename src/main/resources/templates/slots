@@ -1,34 +1,53 @@
--- Muhimbili National Hospital slots
-INSERT INTO slots (hospital_id, max_capacity, current_bookings, slot_date_time, is_booked) VALUES
-(2, 10, 3, '2023-06-01 09:00:00', false),
-(2, 10, 0, '2023-06-01 11:00:00', false),
-(2, 8, 2, '2023-06-02 10:00:00', false),
-(2, 8, 0, '2023-06-03 14:00:00', false);
+-- Muhimbili National Hospital (ID: 1)
+INSERT INTO slots (hospital_id, max_capacity, current_bookings, start_time, end_time, is_booked) VALUES
+(1, 10, 3, '2025-04-05 09:00:00', '2025-04-05 10:30:00', FALSE),
+(1, 10, 5, '2025-04-10 11:00:00', '2025-04-10 12:30:00', FALSE),
+(1, 8, 2, '2025-05-15 10:00:00', '2025-05-15 11:30:00', FALSE),
+(1, 8, 6, '2025-05-25 14:00:00', '2025-05-25 15:30:00', FALSE),
+(1, 9, 0, '2025-06-05 13:00:00', '2025-06-05 14:30:00', FALSE),
+(1, 9, 4, '2025-06-10 08:00:00', '2025-06-10 09:30:00', FALSE);
 
--- Aga Khan Hospital slots
-INSERT INTO slots (hospital_id, max_capacity, current_bookings, slot_date_time, is_booked) VALUES
-(3, 6, 4, '2023-06-01 10:00:00', false),
-(3, 6, 1, '2023-06-02 09:00:00', false),
-(3, 5, 0, '2023-06-03 13:00:00', false),
-(3, 5, 5, '2023-06-04 11:00:00', false);
+-- Aga Khan Hospital (ID: 2)
+INSERT INTO slots (hospital_id, max_capacity, current_bookings, start_time, end_time, is_booked) VALUES
+(2, 6, 4, '2025-04-03 10:00:00', '2025-04-03 11:30:00', FALSE),
+(2, 6, 1, '2025-04-18 09:00:00', '2025-04-18 10:30:00', FALSE),
+(2, 5, 2, '2025-05-08 13:00:00', '2025-05-08 14:30:00', FALSE),
+(2, 5, 5, '2025-05-20 11:00:00', '2025-05-20 12:30:00', FALSE),
+(2, 7, 0, '2025-06-12 15:00:00', '2025-06-12 16:30:00', FALSE),
+(2, 7, 3, '2025-06-22 10:00:00', '2025-06-22 11:30:00', FALSE);
 
--- Tumaini Hospital slots
-INSERT INTO slots (hospital_id, max_capacity, current_bookings, slot_date_time, is_booked) VALUES
-(4, 7, 3, '2023-06-01 13:00:00', false),
-(4, 7, 0, '2023-06-02 15:00:00', false),
-(4, 6, 6, '2023-06-03 10:00:00', false),
-(4, 6, 2, '2023-06-04 09:00:00', false);
+-- Tumaini Hospital (ID: 3)
+INSERT INTO slots (hospital_id, max_capacity, current_bookings, start_time, end_time, is_booked) VALUES
+(3, 7, 3, '2025-04-07 13:00:00', '2025-04-07 14:30:00', FALSE),
+(3, 7, 6, '2025-04-22 15:00:00', '2025-04-22 16:30:00', FALSE),
+(3, 6, 2, '2025-05-10 10:00:00', '2025-05-10 11:30:00', FALSE),
+(3, 6, 0, '2025-05-28 09:00:00', '2025-05-28 10:30:00', FALSE),
+(3, 5, 1, '2025-06-15 14:00:00', '2025-06-15 15:30:00', FALSE),
+(3, 5, 4, '2025-06-27 16:00:00', '2025-06-27 17:30:00', FALSE);
 
--- Mwananyamala Hospital slots
-INSERT INTO slots (hospital_id, max_capacity, current_bookings, slot_date_time, is_booked) VALUES
-(5, 8, 5, '2023-06-01 08:00:00', false),
-(5, 8, 0, '2023-06-02 14:00:00', false),
-(5, 7, 7, '2023-06-03 11:00:00', false),
-(5, 7, 1, '2023-06-04 10:00:00', false);
+-- Mwananyamala Hospital (ID: 4)
+INSERT INTO slots (hospital_id, max_capacity, current_bookings, start_time, end_time, is_booked) VALUES
+(4, 8, 5, '2025-04-09 08:00:00', '2025-04-09 09:30:00', FALSE),
+(4, 8, 3, '2025-04-20 14:00:00', '2025-04-20 15:30:00', FALSE),
+(4, 7, 7, '2025-05-12 11:00:00', '2025-05-12 12:30:00', FALSE),
+(4, 7, 1, '2025-05-25 10:00:00', '2025-05-25 11:30:00', FALSE),
+(4, 9, 0, '2025-06-18 13:00:00', '2025-06-18 14:30:00', FALSE),
+(4, 9, 6, '2025-06-30 15:00:00', '2025-06-30 16:30:00', FALSE);
 
--- Temesek Hospital slots
-INSERT INTO slots (hospital_id, max_capacity, current_bookings, slot_date_time, is_booked) VALUES
-(6, 5, 3, '2023-06-01 14:00:00', false),
-(6, 5, 0, '2023-06-02 16:00:00', false),
-(6, 6, 4, '2023-06-03 15:00:00', false),
-(6, 6, 0, '2023-06-04 13:00:00', false);
+-- Temeke Hospital (ID: 5)
+INSERT INTO slots (hospital_id, max_capacity, current_bookings, start_time, end_time, is_booked) VALUES
+(5, 5, 3, '2025-04-14 14:00:00', '2025-04-14 15:30:00', FALSE),
+(5, 5, 5, '2025-04-29 16:00:00', '2025-04-29 17:30:00', FALSE),
+(5, 6, 4, '2025-05-07 15:00:00', '2025-05-07 16:30:00', FALSE),
+(5, 6, 0, '2025-05-20 13:00:00', '2025-05-20 14:30:00', FALSE),
+(5, 7, 2, '2025-06-10 12:00:00', '2025-06-10 13:30:00', FALSE),
+(5, 7, 3, '2025-06-26 10:00:00', '2025-06-26 11:30:00', FALSE);
+
+-- Amana Regional Hospital (ID: 6)
+INSERT INTO slots (hospital_id, max_capacity, current_bookings, start_time, end_time, is_booked) VALUES
+(6, 6, 2, '2025-04-05 07:00:00', '2025-04-05 09:00:00', false),
+(6, 6, 0, '2025-04-15 12:00:00', '2025-04-15 14:00:00', false),
+(6, 8, 5, '2025-05-07 08:00:00', '2025-05-07 10:00:00', false),
+(6, 8, 1, '2025-05-18 15:00:00', '2025-05-18 17:00:00', false),
+(6, 7, 3, '2025-06-09 11:00:00', '2025-06-09 13:00:00', false),
+(6, 6, 0, '2025-06-20 16:00:00', '2025-06-20 18:00:00', false);

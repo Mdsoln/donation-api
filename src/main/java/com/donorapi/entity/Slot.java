@@ -3,6 +3,7 @@ package com.donorapi.entity;
 
 import com.donorapi.exception.OverBookingException;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Future;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -33,9 +34,11 @@ public class Slot {
     @OneToMany(mappedBy = "slot", cascade = CascadeType.ALL)
     private List<Appointment> appointments;
 
+    @Future
+    private LocalDateTime startTime;
     private int maxCapacity;  // Max donors (e.g., 5-10)
     private int currentBookings = 0;
-    private LocalDateTime slotDateTime;
+    private LocalDateTime endTime;
     private boolean isBooked;
 
     public boolean isAvailable() {

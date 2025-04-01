@@ -3,11 +3,13 @@ package com.donorapi.service;
 import com.donorapi.entity.Donor;
 import com.donorapi.entity.Hospital;
 import com.donorapi.constants.UserRoles;
+import com.donorapi.entity.Slot;
 import com.donorapi.entity.Users;
 import com.donorapi.exception.EmailExistsException;
 import com.donorapi.exception.HospitalFoundException;
 import com.donorapi.jpa.DonorRepository;
 import com.donorapi.jpa.HospitalRepository;
+import com.donorapi.jpa.SlotsRepository;
 import com.donorapi.jpa.UserRepository;
 import com.donorapi.jwt.service.JwtService;
 import com.donorapi.models.*;
@@ -26,7 +28,10 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 
 @Service
@@ -37,6 +42,8 @@ public class BaseService {
     private final UserRepository userRepository;
     private final DonorRepository donorRepository;
     private final HospitalRepository hospitalRepository;
+    private final SlotsRepository hospitalSlotsRepository;
+
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
 
@@ -158,6 +165,28 @@ public class BaseService {
         return ResponseEntity.ok(response);
     }
 
+    public ResponseEntity<List<SlotDto>> getAvailableSlotsByHospitalId(Integer hospitalId) {
+        List<Slot> slots = hospitalSlotsRepository.findSlotsByHospitalId(hospitalId);
+
+        List<SlotDto> availableSlots = slots.stream()
+                .filter(Slot::isAvailable)
+                .map(this::convertToDto)
+                .collect(Collectors.toList());
+
+        return availableSlots.isEmpty()
+                ? ResponseEntity.noContent().build()
+                : ResponseEntity.ok(availableSlots);
+    }
+
+    private SlotDto convertToDto(Slot slot) {
+        return new SlotDto(
+                slot.getSlotId(),
+                slot.getStartTime(),
+                slot.getEndTime(),
+                slot.getMaxCapacity(),
+                slot.getCurrentBookings()
+        );
+    }
 
     private void validateImageType(MultipartFile image) {
         String contentType = image.getContentType();

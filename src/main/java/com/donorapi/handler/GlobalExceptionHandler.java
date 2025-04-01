@@ -44,14 +44,6 @@ public class GlobalExceptionHandler {
                 .body(errorResponse);
     }
 
-    @ExceptionHandler(OverBookingException.class)
-    public ResponseEntity<ErrorResponse> handleNullPointerException(OverBookingException ex) {
-        ErrorResponse errorResponse = new ErrorResponse(ex.getMessage(), ex.getMessage());
-        return ResponseEntity
-                .status(HttpStatus.BAD_REQUEST)
-                .body(errorResponse);
-    }
-
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<ErrorResponse> handleIllegalArgumentException(IllegalArgumentException ex) {
         ErrorResponse errorResponse = new ErrorResponse(ex.getMessage(), ex.getMessage());

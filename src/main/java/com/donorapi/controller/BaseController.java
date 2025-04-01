@@ -1,12 +1,16 @@
 package com.donorapi.controller;
 
 import com.donorapi.entity.Hospital;
+import com.donorapi.entity.Slot;
 import com.donorapi.jpa.HospitalRepository;
 import com.donorapi.models.*;
 import com.donorapi.service.BaseService;
 import com.donorapi.service.LocationService;
+import jakarta.persistence.EntityNotFoundException;
+import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -100,6 +104,17 @@ public class BaseController {
         result.addAll(otherHospitals);
 
         return ResponseEntity.ok(result);
+    }
+
+    @GetMapping("/hospitals/{hospital-id}/slots")
+    public ResponseEntity<?> getHospitalSlots(
+            @PathVariable("hospital-id") @Min(1) Integer hospitalId) {
+
+        if (!hospitalRepository.existsById(hospitalId)) {
+            return ResponseEntity.notFound().build();
+        }
+
+        return baseService.getAvailableSlotsByHospitalId(hospitalId);
     }
 
 }

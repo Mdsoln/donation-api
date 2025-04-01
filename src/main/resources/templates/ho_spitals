@@ -1,0 +1,30 @@
+INSERT INTO hospitals (hospital_id, hospital_name, hospital_address, hospital_city) VALUES
+(1, 'Muhimbili National Hospital', 'United Nations Road, Upanga', 'Dar es Salaam'),
+(2, 'Aga Khan Hospital', 'Ocean Road, Kivukoni', 'Dar es Salaam'),
+(3, 'Tumaini Hospital', 'Ali Hassan Mwinyi Road, Kariakoo', 'Dar es Salaam'),
+(4, 'Mwananyamala Hospital', 'Mwananyamala Road, Kinondoni', 'Dar es Salaam'),
+(5, 'Temeke Hospital', 'Mbagala Rangi Tatu', 'Dar es Salaam'),
+(6,'Amana Regional Hospital', 'Ilala', 'Dar es Salaam');
+
+-- Update hospitals table to include coordinates
+--ALTER TABLE hospitals ADD COLUMN latitude DOUBLE PRECISION;
+--ALTER TABLE hospitals ADD COLUMN longitude DOUBLE PRECISION;
+
+-- Update existing hospitals with coordinates (example values for Dar es Salaam)
+UPDATE hospitals SET 
+  latitude = CASE hospital_id
+    WHEN 2 THEN -6.8139  -- Muhimbili
+    WHEN 3 THEN -6.8213  -- Aga Khan
+    WHEN 4 THEN -6.8167  -- Tumaini
+    WHEN 5 THEN -6.8000  -- Mwananyamala
+    WHEN 6 THEN -6.8500  -- Temeke
+    WHEN 7 THEN -6.8300  -- Amana
+  END,
+  longitude = CASE hospital_id
+    WHEN 2 THEN 39.2800
+    WHEN 3 THEN 39.2880
+    WHEN 4 THEN 39.2833
+    WHEN 5 THEN 39.2667
+    WHEN 6 THEN 39.2667
+    WHEN 7 THEN 39.2667
+  END;
