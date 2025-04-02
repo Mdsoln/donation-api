@@ -40,6 +40,7 @@ public class SecurityConfig {
                         .requestMatchers(SWAGGER_WHITELIST).permitAll()
                         .requestMatchers("/api/v1/donorapp/register-donor", "/api/v1/donorapp/register-hospital").permitAll()
                         .requestMatchers("/api/v1/donorapp/login").permitAll()
+                        .requestMatchers("/api/v1/donorapp/hospitals/nearby","/api/v1/donorapp/hospitals/{hospital-id}/slots").permitAll()
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session
@@ -55,7 +56,7 @@ public class SecurityConfig {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowedOrigins(List.of(
                 "http://localhost:3000",  // Flutter Web
-                "http://192.168.233.49:3000"  //local network IP
+                "http://192.168.57.49:3000"  //local network IP
         ));
 
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));

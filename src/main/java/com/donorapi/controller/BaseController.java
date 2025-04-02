@@ -6,12 +6,11 @@ import com.donorapi.jpa.HospitalRepository;
 import com.donorapi.models.*;
 import com.donorapi.service.BaseService;
 import com.donorapi.service.LocationService;
-import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -20,12 +19,13 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-import java.util.stream.Collectors;
+
 
 @RestController
 @RequestMapping(path = "/api/v1/donorapp")
 @RequiredArgsConstructor
 @Log4j2
+@Validated
 public class BaseController {
 
     private final BaseService baseService;
@@ -80,8 +80,9 @@ public class BaseController {
 
     @GetMapping("/hospitals/nearby")
     public ResponseEntity<List<Hospital>> nearbyHospitals(@RequestParam double userLat, @RequestParam double userLon, @RequestParam(defaultValue = "10") double radiusKm){
+        log.info("Fetching hospitals for lat={}, lon={}, radius={}", userLat, userLon, radiusKm);
         List<Hospital> allHospitals = hospitalRepository.findAllWithCoordinates();
-
+        log.info(allHospitals);
         List<Hospital> nearbyHospitals = allHospitals.stream()
                 .filter(h -> {
                     double distance = locationService.calculateDistance(
@@ -94,11 +95,11 @@ public class BaseController {
                                 userLat, userLon,
                                 h.getLatitude(), h.getLongitude())))
                 .toList();
-
+        log.info(nearbyHospitals);
         List<Hospital> otherHospitals = allHospitals.stream()
                 .filter(h -> !nearbyHospitals.contains(h))
                 .toList();
-
+        log.info(otherHospitals);
         List<Hospital> result = new ArrayList<>();
         result.addAll(nearbyHospitals);
         result.addAll(otherHospitals);
@@ -109,7 +110,7 @@ public class BaseController {
     @GetMapping("/hospitals/{hospital-id}/slots")
     public ResponseEntity<?> getHospitalSlots(
             @PathVariable("hospital-id") @Min(1) Integer hospitalId) {
-
+        log.info("Hospital id is {}", hospitalId);
         if (!hospitalRepository.existsById(hospitalId)) {
             return ResponseEntity.notFound().build();
         }

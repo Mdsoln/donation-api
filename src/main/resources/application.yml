@@ -19,7 +19,10 @@ spring:
       ddl-auto: update
     database: postgresql
     database-platform: org.hibernate.dialect.PostgreSQLDialect
-
+logging:
+  level:
+    root: info
+    com.donorapi.controller.BaseController: debug
 ---
 spring:
   config:
