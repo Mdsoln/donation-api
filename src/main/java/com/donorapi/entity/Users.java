@@ -1,6 +1,6 @@
 package com.donorapi.entity;
 
-import com.donorapi.constants.UserRoles;
+import com.donorapi.models.UserRoles;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;

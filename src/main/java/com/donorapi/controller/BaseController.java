@@ -1,14 +1,15 @@
 package com.donorapi.controller;
 
 import com.donorapi.entity.Hospital;
-import com.donorapi.entity.Slot;
 import com.donorapi.jpa.HospitalRepository;
 import com.donorapi.models.*;
 import com.donorapi.service.BaseService;
 import com.donorapi.service.LocationService;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -73,7 +74,6 @@ public class BaseController {
                 .weight(weight)
                 .profileImage(profileImage)
                 .build();
-
         return baseService.updateProfile(parameter, request);
 
     }
@@ -108,14 +108,19 @@ public class BaseController {
     }
 
     @GetMapping("/hospitals/{hospital-id}/slots")
-    public ResponseEntity<?> getHospitalSlots(
-            @PathVariable("hospital-id") @Min(1) Integer hospitalId) {
+    public ResponseEntity<List<SlotDto>> getHospitalSlots(@PathVariable("hospital-id") @Min(1) Integer hospitalId) {
         log.debug("Hospital id is {}", hospitalId);
         if (!hospitalRepository.existsById(hospitalId)) {
             return ResponseEntity.notFound().build();
         }
+        final List<SlotDto> dtos = baseService.getAvailableSlotsByHospitalId(hospitalId);
+        return dtos.isEmpty() ? ResponseEntity.noContent().build() : ResponseEntity.ok(dtos);
+    }
 
-        return baseService.getAvailableSlotsByHospitalId(hospitalId);
+    @PostMapping("/appointment")
+    public ResponseEntity<AppointmentResponse> appointment(@RequestBody @Valid AppointmentRequest appointmentRequest) {
+        final AppointmentResponse response = baseService.makeAppointment(appointmentRequest);
+        return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
 }

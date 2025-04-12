@@ -1,9 +1,6 @@
 package com.donorapi.handler;
 
-import com.donorapi.exception.EmailExistsException;
-import com.donorapi.exception.ErrorResponse;
-import com.donorapi.exception.HospitalFoundException;
-import com.donorapi.exception.OverBookingException;
+import com.donorapi.exception.*;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
@@ -85,5 +82,22 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
     }
 
+    @ExceptionHandler(DonationEligibilityException.class)
+    public ResponseEntity<ErrorResponse> handleDonationEligibilityException(DonationEligibilityException ex, HttpServletRequest request) {
+        ErrorResponse error = new ErrorResponse();
+        error.setMessage(ex.getMessage());
+        error.setPath(request.getRequestURI());
+        error.setTimestamp(LocalDateTime.now());
+        return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(OverBookingException.class)
+    public ResponseEntity<ErrorResponse> handleOverBookingException(OverBookingException ex, HttpServletRequest request) {
+        ErrorResponse error = new ErrorResponse();
+        error.setMessage(ex.getMessage());
+        error.setPath(request.getRequestURI());
+        error.setTimestamp(LocalDateTime.now());
+        return new ResponseEntity<>(error, HttpStatus.CONFLICT);
+    }
 
 }

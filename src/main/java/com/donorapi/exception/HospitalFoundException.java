@@ -6,5 +6,5 @@ import lombok.EqualsAndHashCode;
 @EqualsAndHashCode(callSuper=true)
 @Data
 public class HospitalFoundException extends RuntimeException {
-    private final String errorCode;
+    private final String errorMessage;
 }

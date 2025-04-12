@@ -25,7 +25,7 @@ import static org.springframework.http.HttpStatus.BAD_REQUEST;
 public class Slot {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer slotId;
+    private Integer id;
 
     @ManyToOne
     @JoinColumn(name = "hospital_id", nullable = false)
@@ -36,7 +36,7 @@ public class Slot {
 
     @Future
     private LocalDateTime startTime;
-    private int maxCapacity;  // Max donors (e.g., 5-10)
+    private int maxCapacity = 10;  // Max donors (e.g., 5-10)
     private int currentBookings = 0;
     private LocalDateTime endTime;
     private boolean isBooked;
@@ -49,7 +49,11 @@ public class Slot {
         if (isAvailable()) {
             this.currentBookings++;
         } else {
-            throw new OverBookingException("Slot is fully booked!", BAD_REQUEST);
+            throw new OverBookingException("Slot is fully booked!");
         }
+    }
+
+    public boolean isFull() {
+        return currentBookings == maxCapacity;
     }
 }

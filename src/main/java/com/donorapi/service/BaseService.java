@@ -1,16 +1,12 @@
 package com.donorapi.service;
 
-import com.donorapi.entity.Donor;
-import com.donorapi.entity.Hospital;
-import com.donorapi.constants.UserRoles;
-import com.donorapi.entity.Slot;
-import com.donorapi.entity.Users;
+import com.donorapi.entity.*;
+import com.donorapi.exception.DonationEligibilityException;
+import com.donorapi.exception.OverBookingException;
+import com.donorapi.jpa.*;
+import com.donorapi.models.UserRoles;
 import com.donorapi.exception.EmailExistsException;
 import com.donorapi.exception.HospitalFoundException;
-import com.donorapi.jpa.DonorRepository;
-import com.donorapi.jpa.HospitalRepository;
-import com.donorapi.jpa.SlotsRepository;
-import com.donorapi.jpa.UserRepository;
 import com.donorapi.jwt.service.JwtService;
 import com.donorapi.models.*;
 import jakarta.persistence.EntityNotFoundException;
@@ -28,9 +24,13 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.Period;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 
@@ -42,10 +42,12 @@ public class BaseService {
     private final UserRepository userRepository;
     private final DonorRepository donorRepository;
     private final HospitalRepository hospitalRepository;
-    private final SlotsRepository hospitalSlotsRepository;
+    private final SlotsRepository slotsRepository;
+    private final AppointmentRepository appointmentRepository;
 
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
+    private final AppointmentJsonConverterImpl converter;
 
     public ResponseEntity<DonorResponse> registerDonor(DonorRegistrationRequest donorRequest) {
 
@@ -161,33 +163,101 @@ public class BaseService {
                 .birthdate(donor.getBirthDate())
                 .gender(donor.getGender())
                 .build();
-
         return ResponseEntity.ok(response);
     }
 
-    public ResponseEntity<List<SlotDto>> getAvailableSlotsByHospitalId(Integer hospitalId) {
+    public List<SlotDto> getAvailableSlotsByHospitalId(Integer hospitalId) {
         log.debug("start.....................................");
-        List<Slot> slots = hospitalSlotsRepository.findSlotsByHospitalId(hospitalId);
-        log.debug(slots.toString());
+        List<Slot> slots = slotsRepository.findSlotsByHospitalId(hospitalId);
+        LocalDateTime now = LocalDateTime.now();
         List<SlotDto> availableSlots = slots.stream()
-                .filter(Slot::isAvailable)
-                .map(this::convertToDto)
+                .filter(slot -> slot.getStartTime().isAfter(now))
+                .map(slot -> {
+                    SlotDto dto = convertToDto(slot);
+                    if (slot.isFull()) {
+                        dto.setAvailableBookings(-1);
+                    }
+                    return dto;
+                }).sorted(Comparator.comparing(SlotDto::getStartTime))
                 .collect(Collectors.toList());
-        log.debug(availableSlots.toString());
+
         log.debug("end.....................................");
-        return availableSlots.isEmpty()
-                ? ResponseEntity.noContent().build()
-                : ResponseEntity.ok(availableSlots);
+        return availableSlots;
+    }
+
+    public AppointmentResponse makeAppointment(AppointmentRequest request){
+     log.debug("create...................................appointment");
+     final Donor donor = donorRepository.findByDonorId(request.getDonorId()).orElseThrow(
+             ()-> new EntityNotFoundException("Donor with ID " + request.getDonorId() + " not found")
+     );
+     validateDonorEligibility(donor);
+
+     final Slot slot = slotsRepository.findById(request.getSlotId()).orElseThrow(
+             ()-> new EntityNotFoundException("Slot with ID " + request.getSlotId() + " not found")
+     );
+
+     Appointment appointment = getAppointment(request, slot, donor);
+     appointmentRepository.save(appointment);
+     slot.addBooking();
+     slotsRepository.save(slot);
+     log.debug("end..........................appointment");
+     return converter.convertToResponse(appointment);
+    }
+
+    private Appointment getAppointment(AppointmentRequest request, Slot slot, Donor donor) {
+        if (slot.getHospital().getHospitalId() != request.getHospitalId()) {
+            throw new IllegalStateException("Slot with  ID " + request.getSlotId() + "does not belong to hospital ID " + request.getHospitalId());
+        }
+        if (slot.isFull()) {
+            throw new OverBookingException("Slot with  ID " + request.getSlotId() + "is already full");
+        }
+
+        final LocalDate appointmentDate = slot.getStartTime().toLocalDate();
+        Appointment appointment = new Appointment();
+        appointment.setDonor(donor);
+        appointment.setSlot(slot);
+        appointment.setAppointmentDate(appointmentDate);
+        appointment.setDescription(AppointmentDescription.APPOINTMENT_DESCRIPTION);
+        appointment.setStatus(AppointmentStatus.PENDING);
+        return appointment;
+    }
+
+    private void validateDonorEligibility(Donor donor) {
+        log.debug("validate.............donor.............eligibility");
+        final List<Appointment> activeAppointments = appointmentRepository.findByDonorAndStatusNot(donor, AppointmentStatus.COMPLETED);
+        if (!activeAppointments.isEmpty()) {
+            throw new DonationEligibilityException("You already have an active blood donation appointment.");
+        }
+
+        final LocalDate threeMonthsAgo = LocalDate.now().minusMonths(3);
+        final Optional<Appointment> lastDonation = appointmentRepository.findByDonorAndStatusOrderBySlotEndTimeDesc(donor, AppointmentStatus.COMPLETED);
+        if (lastDonation.isPresent()) {
+            final LocalDate lastDonationDate = lastDonation.get().getSlot().getEndTime().toLocalDate();
+            if (lastDonationDate.isAfter(threeMonthsAgo)) {
+                final Period period = Period.between(lastDonationDate, LocalDate.now());
+                throw new DonationEligibilityException(
+                        "You must wait 3 months between donations. " +
+                                "Your last donation was " + period.getMonths() + " months and " +
+                                period.getDays() + " days ago."
+                );
+            }
+        }
+
+        final LocalDate today = LocalDate.now();
+        final boolean hasSameDayAppointment = activeAppointments.stream()
+                .anyMatch(a -> a.getAppointmentDate().equals(today));
+        if (hasSameDayAppointment) {
+            throw new DonationEligibilityException("You already have an appointment today");
+        }
     }
 
     private SlotDto convertToDto(Slot slot) {
         return new SlotDto(
-                slot.getSlotId(),
+                slot.getId(),
                 slot.getHospital().getHospitalId(),
                 slot.getStartTime(),
                 slot.getEndTime(),
-                slot.getMaxCapacity(),
-                slot.getCurrentBookings()
+                slot.getMaxCapacity() - slot.getCurrentBookings()
         );
     }
 
