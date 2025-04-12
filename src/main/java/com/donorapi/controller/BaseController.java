@@ -110,7 +110,7 @@ public class BaseController {
     @GetMapping("/hospitals/{hospital-id}/slots")
     public ResponseEntity<?> getHospitalSlots(
             @PathVariable("hospital-id") @Min(1) Integer hospitalId) {
-        log.info("Hospital id is {}", hospitalId);
+        log.debug("Hospital id is {}", hospitalId);
         if (!hospitalRepository.existsById(hospitalId)) {
             return ResponseEntity.notFound().build();
         }

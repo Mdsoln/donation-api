@@ -56,7 +56,7 @@ public class SecurityConfig {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowedOrigins(List.of(
                 "http://localhost:3000",  // Flutter Web
-                "http://192.168.57.49:3000"  //local network IP
+                "http://192.168.45.49:3000"  //local network IP
         ));
 
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));

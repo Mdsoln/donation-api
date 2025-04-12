@@ -5,50 +5,85 @@ import com.donorapi.exception.ErrorResponse;
 import com.donorapi.exception.HospitalFoundException;
 import com.donorapi.exception.OverBookingException;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.HttpRequestMethodNotSupportedException;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+
+import java.time.LocalDateTime;
 
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(EmailExistsException.class)
-    public ResponseEntity<ErrorResponse> handleEmailExistsException(EmailExistsException ex) {
-        ErrorResponse errorResponse = new ErrorResponse(ex.getErrorCode(), ex.getMessage());
-        return ResponseEntity
-                .status(HttpStatus.CONFLICT)
-                .body(errorResponse);
+    public ResponseEntity<ErrorResponse> handleEmailExistsException(EmailExistsException ex, HttpServletRequest request) {
+        ErrorResponse errorResponse = new ErrorResponse();
+        errorResponse.setMessage(ex.getMessage());
+        errorResponse.setPath(request.getRequestURI());
+        errorResponse.setTimestamp(LocalDateTime.now());
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(errorResponse);
     }
 
+
     @ExceptionHandler(EntityNotFoundException.class)
-    public ResponseEntity<String> handleEntityNotFoundException(EntityNotFoundException ex) {
-        return ResponseEntity
-                .status(HttpStatus.NOT_FOUND)
-                .body(ex.getMessage());
+    public ResponseEntity<ErrorResponse> handleEntityNotFoundException(EntityNotFoundException ex, HttpServletRequest request ) {
+        ErrorResponse errorResponse = new ErrorResponse();
+        errorResponse.setMessage(ex.getMessage());
+        errorResponse.setPath(request.getRequestURI());
+        errorResponse.setTimestamp(LocalDateTime.now());
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
     }
 
     @ExceptionHandler(HospitalFoundException.class)
-    public ResponseEntity<String> handleHospitalFoundException(HospitalFoundException ex) {
-        return ResponseEntity
-                .status(HttpStatus.CONFLICT)
-                .body(ex.getMessage());
+    public ResponseEntity<ErrorResponse> handleHospitalFoundException(HospitalFoundException ex, HttpServletRequest request) {
+        ErrorResponse errorResponse = new ErrorResponse();
+        errorResponse.setMessage(ex.getMessage());
+        errorResponse.setPath(request.getRequestURI());
+        errorResponse.setTimestamp(LocalDateTime.now());
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(errorResponse);
     }
 
     @ExceptionHandler(NullPointerException.class)
-    public ResponseEntity<ErrorResponse> handleNullPointerException(NullPointerException ex) {
-        ErrorResponse errorResponse = new ErrorResponse(ex.getMessage(), ex.getMessage());
-        return ResponseEntity
-                .status(HttpStatus.BAD_REQUEST)
-                .body(errorResponse);
+    public ResponseEntity<ErrorResponse> handleNullPointerException(NullPointerException ex, HttpServletRequest request) {
+        ErrorResponse errorResponse = new ErrorResponse();
+        errorResponse.setMessage(ex.getMessage());
+        errorResponse.setPath(request.getRequestURI());
+        errorResponse.setTimestamp(LocalDateTime.now());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
     }
 
     @ExceptionHandler(IllegalArgumentException.class)
-    public ResponseEntity<ErrorResponse> handleIllegalArgumentException(IllegalArgumentException ex) {
-        ErrorResponse errorResponse = new ErrorResponse(ex.getMessage(), ex.getMessage());
-        return ResponseEntity
-                .status(HttpStatus.BAD_REQUEST)
-                .body(errorResponse);
+    public ResponseEntity<ErrorResponse> handleIllegalArgumentException(IllegalArgumentException ex, HttpServletRequest request) {
+        ErrorResponse errorResponse = new ErrorResponse();
+        errorResponse.setMessage(ex.getMessage());
+        errorResponse.setPath(request.getRequestURI());
+        errorResponse.setTimestamp(LocalDateTime.now());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
     }
+
+    @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
+    public ResponseEntity<ErrorResponse> handleMethodNotSupported(HttpRequestMethodNotSupportedException ex, HttpServletRequest request) {
+        ErrorResponse error = new ErrorResponse();
+        error.setMessage("Method '" + ex.getMethod() + "' not supported.");
+        error.setPath(request.getRequestURI());
+        error.setTimestamp(LocalDateTime.now());
+        return new ResponseEntity<>(error, HttpStatus.METHOD_NOT_ALLOWED);
+    }
+
+    @ExceptionHandler(MissingServletRequestParameterException.class)
+    public ResponseEntity<ErrorResponse> handleMissingParams(MissingServletRequestParameterException ex, HttpServletRequest request) {
+        String name = ex.getParameterName();
+        String dataType = ex.getParameterType();
+        ErrorResponse error = new ErrorResponse();
+        error.setMessage("Missing required request parameter: " + name + " for method parameter type " + dataType + " is not present");
+        error.setPath(request.getRequestURI());
+        error.setTimestamp(LocalDateTime.now());
+        return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
+    }
+
+
 }

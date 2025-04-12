@@ -22,7 +22,7 @@ spring:
 logging:
   level:
     root: info
-    com.donorapi.controller.BaseController: debug
+    com.donorapi: debug
 ---
 spring:
   config:

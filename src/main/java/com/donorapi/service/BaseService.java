@@ -166,13 +166,15 @@ public class BaseService {
     }
 
     public ResponseEntity<List<SlotDto>> getAvailableSlotsByHospitalId(Integer hospitalId) {
+        log.debug("start.....................................");
         List<Slot> slots = hospitalSlotsRepository.findSlotsByHospitalId(hospitalId);
-
+        log.debug(slots.toString());
         List<SlotDto> availableSlots = slots.stream()
                 .filter(Slot::isAvailable)
                 .map(this::convertToDto)
                 .collect(Collectors.toList());
-
+        log.debug(availableSlots.toString());
+        log.debug("end.....................................");
         return availableSlots.isEmpty()
                 ? ResponseEntity.noContent().build()
                 : ResponseEntity.ok(availableSlots);
@@ -181,6 +183,7 @@ public class BaseService {
     private SlotDto convertToDto(Slot slot) {
         return new SlotDto(
                 slot.getSlotId(),
+                slot.getHospital().getHospitalId(),
                 slot.getStartTime(),
                 slot.getEndTime(),
                 slot.getMaxCapacity(),
