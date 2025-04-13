@@ -19,6 +19,11 @@ spring:
       ddl-auto: update
     database: postgresql
     database-platform: org.hibernate.dialect.PostgreSQLDialect
+  task:
+    execution:
+       pool:
+          core-size: 5
+          max-size: 10
 logging:
   level:
     root: info
@@ -38,3 +43,8 @@ spring:
       ddl-auto: update
     database: postgresql
     database-platform: org.hibernate.dialect.PostgreSQLDialect
+  task:
+    execution:
+      pool:
+        core-size: 5
+        max-size: 10

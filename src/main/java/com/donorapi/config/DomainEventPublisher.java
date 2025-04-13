@@ -1,4 +1,4 @@
-package com.donorapi.service;
+package com.donorapi.config;
 
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;

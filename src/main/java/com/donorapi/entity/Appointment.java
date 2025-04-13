@@ -1,6 +1,8 @@
 package com.donorapi.entity;
 
 import com.donorapi.models.AppointmentStatus;
+import com.donorapi.service.AppointmentOverdueEvent;
+import com.donorapi.config.DomainEventPublisher;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -11,12 +13,9 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 
-@NoArgsConstructor
-@AllArgsConstructor
-@Setter
-@Getter
 @Entity
 @Table(name = "appointment")
+@Getter @Setter @NoArgsConstructor @AllArgsConstructor
 public class Appointment {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -41,6 +40,15 @@ public class Appointment {
     @Column(name = "date", nullable = false)
     private LocalDate appointmentDate;
 
+
+    @PreUpdate
+    public void checkForOverdue() {
+        if (this.status == AppointmentStatus.SCHEDULED &&
+                LocalDateTime.now().isAfter(this.slot.getEndTime())) {
+            this.markAsOverdue();
+            DomainEventPublisher.publish(new AppointmentOverdueEvent(this));
+        }
+    }
 
     public void markAsOverdue() {
         this.status = AppointmentStatus.OVERDUE;

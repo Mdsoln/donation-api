@@ -1,7 +1,9 @@
-package com.donorapi.service;
+package com.donorapi.config;
 
 import com.donorapi.entity.Appointment;
 import com.donorapi.jpa.AppointmentRepository;
+import com.donorapi.service.AppointmentOverdueEvent;
+import com.donorapi.service.NotificationService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.event.EventListener;
