@@ -40,7 +40,6 @@ public class SecurityConfig {
                         .requestMatchers(SWAGGER_WHITELIST).permitAll()
                         .requestMatchers("/api/v1/donorapp/register-donor", "/api/v1/donorapp/register-hospital").permitAll()
                         .requestMatchers("/api/v1/donorapp/login").permitAll()
-                        .requestMatchers("/api/v1/donorapp/hospitals/nearby","/api/v1/donorapp/hospitals/{hospital-id}/slots").permitAll()
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session
