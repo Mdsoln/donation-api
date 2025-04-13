@@ -230,22 +230,29 @@ public class BaseService {
             throw new DonationEligibilityException("You already have an active blood donation appointment.");
         }
 
-        final LocalDate threeMonthsAgo = LocalDate.now().minusMonths(3);
-        final Optional<Appointment> lastDonation = appointmentRepository.findByDonorAndStatusOrderBySlotEndTimeDesc(donor, AppointmentStatus.COMPLETED);
+        final LocalDate today = LocalDate.now();
+        final Optional<Appointment> lastDonation = appointmentRepository.findByDonorAndStatusOrderBySlotEndTimeDesc(
+                donor, AppointmentStatus.COMPLETED);
+
         if (lastDonation.isPresent()) {
             final LocalDate lastDonationDate = lastDonation.get().getSlot().getEndTime().toLocalDate();
-            if (lastDonationDate.isAfter(threeMonthsAgo)) {
-                final Period period = Period.between(lastDonationDate, LocalDate.now());
+
+            if (lastDonationDate.isAfter(today)) {
+                throw new DonationEligibilityException(
+                        "You have a scheduled donation on " + lastDonationDate +
+                                ". Please complete or cancel it before booking a new appointment.");
+            }
+
+            LocalDate threeMonthsAfterDonation = lastDonationDate.plusMonths(3);
+            if (today.isBefore(threeMonthsAfterDonation)) {
+                Period remainingWait = Period.between(today, threeMonthsAfterDonation);
                 throw new DonationEligibilityException(
                         "You must wait 3 months between donations. " +
-                                "Your last donation was " + period.getMonths() + " months and " +
-                                period.getDays() + " days ago."
-                );
+                                "You can donate again in " + remainingWait.getMonths() + " months and " +
+                                remainingWait.getDays() + " days.");
             }
         }
-
-        final LocalDate today = LocalDate.now();
-        final boolean hasSameDayAppointment = activeAppointments.stream()
+        boolean hasSameDayAppointment = activeAppointments.stream()
                 .anyMatch(a -> a.getAppointmentDate().equals(today));
         if (hasSameDayAppointment) {
             throw new DonationEligibilityException("You already have an appointment today");
