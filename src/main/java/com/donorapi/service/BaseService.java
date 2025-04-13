@@ -162,6 +162,7 @@ public class BaseService {
                 .height(donor.getHeight())
                 .birthdate(donor.getBirthDate())
                 .gender(donor.getGender())
+                .imageName(donor.getImage())
                 .build();
         return ResponseEntity.ok(response);
     }
