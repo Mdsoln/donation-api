@@ -13,8 +13,6 @@ import lombok.Setter;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import static org.springframework.http.HttpStatus.BAD_REQUEST;
-
 
 @Entity
 @Table(name = "slots")
