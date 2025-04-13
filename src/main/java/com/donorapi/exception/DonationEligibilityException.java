@@ -6,5 +6,7 @@ import lombok.EqualsAndHashCode;
 @EqualsAndHashCode(callSuper=true)
 @Data
 public class DonationEligibilityException extends RuntimeException {
-    private final String errorMessage;
+    public DonationEligibilityException(String message) {
+        super(message);
+    }
 }

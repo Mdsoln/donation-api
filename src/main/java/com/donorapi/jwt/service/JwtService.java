@@ -20,6 +20,7 @@ import java.util.function.Function;
 public class JwtService {
 
     private static final String SECRET_KEY = "yILd4iHh3ngQWnnEnDhXNQmpOpreM5R0KxNKlHAX5BmNR/elp4ybJfKc6GTgwlPu";
+    private static final long TOKEN_VALIDITY_ONE_DAY = 1000L * 60 * 60 * 24;
 
 
     public String extractUsername(String jwt) {
@@ -53,8 +54,10 @@ public class JwtService {
                 .builder()
                 .setClaims(extraClaims)
                 .setSubject(userDetails.getUsername())
+                .setIssuer("DonorAPI")
+                .setAudience("donor-client")
                 .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + 1000L * 60 * 60 * 24))
+                .setExpiration(new Date(System.currentTimeMillis() + TOKEN_VALIDITY_ONE_DAY))
                 .signWith(getSignInKey(), SignatureAlgorithm.HS256)
                 .compact();
     }
@@ -63,8 +66,11 @@ public class JwtService {
         return Jwts
                 .builder()
                 .setSubject(userDetails.getUsername())
+                .setIssuer("DonorAPI")
+                .setAudience("donor-client")
+                .claim("roles", userDetails.getAuthorities())
                 .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 30))
+                .setExpiration(new Date(System.currentTimeMillis() + TOKEN_VALIDITY_ONE_DAY))
                 .signWith(getSignInKey(), SignatureAlgorithm.HS256)
                 .compact();
     }
