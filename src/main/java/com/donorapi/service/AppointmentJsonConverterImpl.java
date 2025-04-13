@@ -14,7 +14,7 @@ public class AppointmentJsonConverterImpl implements AppointmentMapper{
     private static final DateTimeFormatter TIME_FORMATTER = DateTimeFormatter.ofPattern("HH:mm");
 
     @Override
-    public AppointmentResponse convertToResponse(Appointment appointment) {
+    public AppointmentResponse convertToResponse(Appointment appointment, int total, int attended, int expired) {
         Slot slot = appointment.getSlot();
         Hospital hospital = slot.getHospital();
 
@@ -34,7 +34,10 @@ public class AppointmentJsonConverterImpl implements AppointmentMapper{
                 hospital.getHospitalAddress(),
                 date,
                 timeRange,
-                status
+                status,
+                total,
+                attended,
+                expired
         );
     }
 }

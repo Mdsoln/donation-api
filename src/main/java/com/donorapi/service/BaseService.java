@@ -27,10 +27,7 @@ import java.nio.file.StandardCopyOption;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.Period;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 
@@ -201,8 +198,12 @@ public class BaseService {
      appointmentRepository.save(appointment);
      slot.addBooking();
      slotsRepository.save(slot);
+
+     final int total = appointmentRepository.countByDonor(donor);
+     final int attended = appointmentRepository.countByDonorAndStatus(donor, AppointmentStatus.COMPLETED);
+     final int expired = appointmentRepository.countByDonorAndStatus(donor, AppointmentStatus.OVERDUE);
      log.debug("end..........................appointment");
-     return converter.convertToResponse(appointment);
+     return converter.convertToResponse(appointment, total, attended, expired);
     }
 
     private Appointment getAppointment(AppointmentRequest request, Slot slot, Donor donor) {

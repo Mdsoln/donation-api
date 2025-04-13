@@ -15,4 +15,7 @@ public class AppointmentResponse {
     private String date;
     private String timeRange;
     private String status;
+    private int totalAppointments;
+    private int attendedAppointments;
+    private int expiredAppointments;
 }

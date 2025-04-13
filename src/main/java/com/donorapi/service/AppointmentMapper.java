@@ -4,5 +4,6 @@ import com.donorapi.entity.Appointment;
 import com.donorapi.models.AppointmentResponse;
 
 public interface AppointmentMapper {
-    AppointmentResponse convertToResponse(Appointment appointment);
+    AppointmentResponse convertToResponse(Appointment appointment, int total, int attended, int expired);
+
 }
