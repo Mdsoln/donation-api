@@ -1,8 +1,10 @@
 package com.donorapi.handler;
 
 import com.donorapi.exception.*;
+import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
@@ -98,6 +100,21 @@ public class GlobalExceptionHandler {
         error.setPath(request.getRequestURI());
         error.setTimestamp(LocalDateTime.now());
         return new ResponseEntity<>(error, HttpStatus.CONFLICT);
+    }
+
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    public ResponseEntity<ErrorResponse> handleDataIntegrityViolationException(
+            DataIntegrityViolationException ex, HttpServletRequest request) {
+
+        Throwable rootCause = ex.getRootCause();
+        String message = rootCause != null ? rootCause.getMessage() : ex.getMessage();
+
+        ErrorResponse error = new ErrorResponse();
+        error.setMessage(message.replaceAll("\"", ""));
+        error.setPath(request.getRequestURI());
+        error.setTimestamp(LocalDateTime.now());
+
+        return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
     }
 
 }
