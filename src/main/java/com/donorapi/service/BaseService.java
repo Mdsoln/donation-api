@@ -46,7 +46,7 @@ public class BaseService {
     private final JwtService jwtService;
     private final AppointmentJsonConverterImpl converter;
 
-    public ResponseEntity<DonorResponse> registerDonor(DonorRegistrationRequest donorRequest) {
+    public ResponseEntity<String> registerDonor(DonorRegistrationRequest donorRequest) {
 
         donorRepository.findByEmail(donorRequest.getEmail()).ifPresent(donor -> {
             throw new EmailExistsException("EMAIL_ALREADY_EXISTS", "A donor with this email already exists.");
@@ -64,11 +64,10 @@ public class BaseService {
         donor.setPhone(donorRequest.getPhone());
         donorRepository.save(donor);
 
-        return new ResponseEntity<>(new DonorResponse(
-                donor.getDonorId(), donor.getEmail(), donor.getPhone()), HttpStatus.CREATED);
+        return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
-    public ResponseEntity<HospitalResponse> registerHospital(HospitalRegistrationRequest hospitalRequest) {
+    public ResponseEntity<String> registerHospital(HospitalRegistrationRequest hospitalRequest) {
 
         hospitalRepository.findByHospitalName(hospitalRequest.getHospitalName()).ifPresent(hospital -> {
             throw new HospitalFoundException("Hospital already exists");
@@ -85,10 +84,7 @@ public class BaseService {
         hospital.setHospitalAddress(hospitalRequest.getHospitalAddress());
         hospital.setHospitalCity(hospitalRequest.getHospitalCity());
         hospitalRepository.save(hospital);
-        return new ResponseEntity<>(
-                new HospitalResponse(hospital.getHospitalId(), hospital.getHospitalName(), hospital.getHospitalAddress(),
-                        hospital.getHospitalCity()), HttpStatus.CREATED
-        );
+        return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
     public ResponseEntity<AuthResponse> authenticateUser(AuthRequest request){

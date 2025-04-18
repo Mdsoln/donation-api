@@ -34,12 +34,12 @@ public class BaseController {
     private final HospitalRepository hospitalRepository;
 
     @PostMapping("/register-donor")
-    public ResponseEntity<DonorResponse> registerDonor(@RequestBody DonorRegistrationRequest donorRequest) {
+    public ResponseEntity<String> registerDonor(@RequestBody DonorRegistrationRequest donorRequest) {
        return baseService.registerDonor(donorRequest);
     }
 
     @PostMapping("/register-hospital")
-    public ResponseEntity<HospitalResponse> registerHospital(@RequestBody HospitalRegistrationRequest hospitalRequest) {
+    public ResponseEntity<String> registerHospital(@RequestBody HospitalRegistrationRequest hospitalRequest) {
         return baseService.registerHospital(hospitalRequest);
     }
 
