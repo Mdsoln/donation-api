@@ -1,7 +1,6 @@
 package com.donorapi.handler;
 
 import com.donorapi.exception.*;
-import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.dao.DataIntegrityViolationException;
