@@ -11,8 +11,8 @@ public class AuthResponse {
     private String message;
     private String token;
     private String username;
-    private String roles;
-    private String email;
-    private String phone;
-    private HospitalResponse hospital;
+    private String bloodGroup;
+    private int donations;
+    private String picture;
+    private AppointmentCard latestAppointment;
 }

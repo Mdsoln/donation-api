@@ -10,8 +10,7 @@ import lombok.Setter;
 @Setter
 @Getter
 public class AppointmentResponse {
-    private String hospitalName;
-    private String location;
+    private HospitalResponse hospitalResponse;
     private String date;
     private String timeRange;
     private String status;

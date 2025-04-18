@@ -14,4 +14,6 @@ public interface DonorRepository extends JpaRepository<Donor, Integer> {
     Optional<Donor> findByUser(Users user);
 
    Optional<Donor> findByDonorId(Integer donorId);
+
+   int countByAppointmentDonor(Donor donor);
 }
