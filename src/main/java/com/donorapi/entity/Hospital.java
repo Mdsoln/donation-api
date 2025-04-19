@@ -15,7 +15,7 @@ import lombok.Setter;
 public class Hospital {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer hospitalId;
+    private Long hospitalId;
 
     @OneToOne
     @JoinColumn(name = "user_id")
