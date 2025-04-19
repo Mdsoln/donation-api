@@ -48,7 +48,7 @@ public class BaseService {
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
     private final AppointmentJsonConverterImpl converter;
-    private final DateFormatter formatter;
+    
 
     public ResponseEntity<String> registerDonor(DonorRegistrationRequest donorRequest) {
 
@@ -319,8 +319,8 @@ public class BaseService {
     
         return AppointmentCard.builder()
                 .hospital(mapToHospitalResponse(hospital))
-                .date(formatter.formatDate(slot.getStartTime()))
-                .timeRange(formatter.formatTimeRange(slot.getStartTime(), slot.getEndTime()))
+                .date(DateFormatter.formatDate(slot.getStartTime()))
+                .timeRange(DateFormatter.formatTimeRange(slot.getStartTime(), slot.getEndTime()))
                 .dayToGo(daysToGo)
                 .build();
     }
