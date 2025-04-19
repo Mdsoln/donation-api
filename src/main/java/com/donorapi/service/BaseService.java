@@ -101,7 +101,7 @@ public class BaseService {
 
                     final Donor donor = donorRepository.findByUser(user).orElse(null);
                     assert donor != null;
-                    log.debug("Donor fetched successfuly..................");
+                    log.debug("Donor fetched successfully..................");
                     final String formattedFirstName = extractFirstName(donor.getFullName());
                     final String image = buildImagePath(donor.getImage());
                     final String picture = buildImagePath(image);
