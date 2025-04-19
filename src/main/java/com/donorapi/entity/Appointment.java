@@ -55,4 +55,14 @@ public class Appointment {
         this.overdue = true;
         this.statusChangedAt = LocalDateTime.now();
     }
+
+
+    public boolean hasPendingStatus(){
+        return this.status.equals(AppointmentStatus.PENDING);
+    }
+
+    public boolean hasScheduledStatus(){
+        return this.status.equals(AppointmentStatus.SCHEDULED);
+    }
+
 }

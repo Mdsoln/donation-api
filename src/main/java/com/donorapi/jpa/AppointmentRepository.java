@@ -4,6 +4,8 @@ import com.donorapi.entity.Appointment;
 import com.donorapi.entity.Donor;
 import com.donorapi.models.AppointmentStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
@@ -23,4 +25,9 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Long> 
     List<Appointment> findByStatusAndSlotEndTimeBefore(AppointmentStatus status, LocalDateTime slot_endTime);
 
     Optional<Appointment> findFirstByDonorAndStatusOrderByAppointmentDateAsc(Donor donor, AppointmentStatus status);
+
+    @Query("SELECT DISTINCT d FROM Appointment a JOIN a.donor d WHERE a.slot.hospital.hospitalId = :hospitalId")
+    List<Donor> findDistinctDonorsByHospitalId(@Param("hospitalId") Long hospitalId);
+
+    List<Appointment> findAppointmentsBySlot_Hospital_HospitalId(Integer slotHospitalHospitalId);
 }
