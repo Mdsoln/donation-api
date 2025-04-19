@@ -14,12 +14,12 @@ import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 
+import org.apache.commons.io.FilenameUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -278,27 +278,34 @@ public class BaseService {
     }
 
     private String storeImages(MultipartFile image) throws IOException {
-       if (image == null || image.isEmpty()) {
-        throw new IllegalArgumentException("Image file is null or empty");
-       }
+        String originalFilename = image.getOriginalFilename();
+        assert FilenameUtils.getExtension(originalFilename) != null;
+        String fileExtension = FilenameUtils.getExtension(originalFilename).toLowerCase();
 
-       String uploadDirectory = "src/main/resources/static";
-       String imageName = StringUtils.cleanPath(Objects.requireNonNull(image.getOriginalFilename()));
+        if (!List.of("jpg", "jpeg", "png").contains(fileExtension)) {
+            throw new IllegalArgumentException("Invalid file type");
+        }
 
-       if (imageName.contains("..")) {
-         throw new IllegalArgumentException("Invalid file format");
-       }
+        String imageName = UUID.randomUUID() + "." + fileExtension;
+        if (imageName.contains("..") || imageName.contains("/") || imageName.contains("\\")) {
+            throw new IllegalArgumentException("Invalid filename generated.");
+        }
 
-       Path uploadPath = Paths.get(uploadDirectory);
+        Path uploadPath = Paths.get(System.getProperty("user.home"), "uploads", "profile-images");
         if (!Files.exists(uploadPath)) {
-          Files.createDirectories(uploadPath);
+            Files.createDirectories(uploadPath);
         }
 
         Path filePath = uploadPath.resolve(imageName);
-          Files.copy(image.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
+        if (!filePath.startsWith(uploadPath)) {
+            throw new SecurityException("Detected attempt to write outside the upload directory");
+        }
 
-          return imageName;
+        Files.copy(image.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
+
+        return imageName;
     }
+
 
     private String extractFirstName(String fullName) {
         if (fullName == null || fullName.isBlank()) return "User";
