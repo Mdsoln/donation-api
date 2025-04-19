@@ -12,19 +12,19 @@ public class DateFormatter {
         // Prevent instantiation
     }
 
-    public String formatDate(LocalDateTime dateTime) {
+    public static String formatDate(LocalDateTime dateTime) {
         return dateTime.format(DATE_FORMATTER);
     }
 
-    public String formatTime(LocalTime time) {
+    public static String formatTime(LocalTime time) {
         return time.format(TIME_FORMATTER);
     }
 
-    public String formatTimeRange(LocalTime start, LocalTime end) {
+    public static String formatTimeRange(LocalTime start, LocalTime end) {
         return formatTime(start) + " - " + formatTime(end);
     }
 
-    public String formatTimeRange(LocalDateTime start, LocalDateTime end) {
+    public static String formatTimeRange(LocalDateTime start, LocalDateTime end) {
         return formatTime(start.toLocalTime()) + " - " + formatTime(end.toLocalTime());
     }
 }
