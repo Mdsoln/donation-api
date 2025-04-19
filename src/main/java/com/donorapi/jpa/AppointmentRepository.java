@@ -29,5 +29,5 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Long> 
     @Query("SELECT DISTINCT d FROM Appointment a JOIN a.donor d WHERE a.slot.hospital.hospitalId = :hospitalId")
     List<Donor> findDistinctDonorsByHospitalId(@Param("hospitalId") Long hospitalId);
 
-    List<Appointment> findAppointmentsBySlot_Hospital_HospitalId(Integer slotHospitalHospitalId);
+    List<Appointment> findAppointmentsBySlot_Hospital_HospitalId(Long slotHospitalHospitalId);
 }

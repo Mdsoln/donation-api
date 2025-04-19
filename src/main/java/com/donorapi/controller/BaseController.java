@@ -11,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -23,7 +24,7 @@ import java.util.List;
 
 
 @RestController
-@RequestMapping(path = "/api/v1/donorapp")
+@RequestMapping(path = "/api/v1/donor")
 @RequiredArgsConstructor
 @Log4j2
 @Validated
@@ -33,16 +34,13 @@ public class BaseController {
     private final LocationService locationService;
     private final HospitalRepository hospitalRepository;
 
+    @PreAuthorize("hasRole('DONOR')")
     @PostMapping("/register-donor")
     public ResponseEntity<String> registerDonor(@RequestBody DonorRegistrationRequest donorRequest) {
        return baseService.registerDonor(donorRequest);
     }
 
-    @PostMapping("/register-hospital")
-    public ResponseEntity<String> registerHospital(@RequestBody HospitalRegistrationRequest hospitalRequest) {
-        return baseService.registerHospital(hospitalRequest);
-    }
-
+    @PreAuthorize("hasRole('DONOR')")
     @PostMapping("/login")
     public ResponseEntity<AuthResponse> login(@RequestBody AuthRequest authRequest) {
         if (authRequest == null || authRequest.getUsername() == null || authRequest.getUsername().trim().isEmpty()
@@ -52,7 +50,7 @@ public class BaseController {
         return baseService.authenticateUser(authRequest);
     }
 
-
+    @PreAuthorize("hasRole('DONOR')")
     @PostMapping("/{donor-id}/update-profile")
     public ResponseEntity<ProfileResponse> updateProfile(
             @PathVariable("donor-id") Integer parameter, @RequestParam(name = "fullname") String fullname, @RequestParam(name = "email") String email,
@@ -78,6 +76,7 @@ public class BaseController {
 
     }
 
+    @PreAuthorize("hasRole('DONOR')")
     @GetMapping("/hospitals/nearby")
     public ResponseEntity<List<Hospital>> nearbyHospitals(@RequestParam double userLat, @RequestParam double userLon, @RequestParam(defaultValue = "10") double radiusKm){
         log.info("Fetching hospitals for lat={}, lon={}, radius={}", userLat, userLon, radiusKm);
@@ -107,8 +106,9 @@ public class BaseController {
         return ResponseEntity.ok(result);
     }
 
+    @PreAuthorize("hasRole('DONOR')")
     @GetMapping("/hospitals/{hospital-id}/slots")
-    public ResponseEntity<List<SlotDto>> getHospitalSlots(@PathVariable("hospital-id") @Min(1) Integer hospitalId) {
+    public ResponseEntity<List<SlotDto>> getHospitalSlots(@PathVariable("hospital-id") @Min(1) Long hospitalId) {
         log.debug("Hospital id is {}", hospitalId);
         if (!hospitalRepository.existsById(hospitalId)) {
             return ResponseEntity.notFound().build();
@@ -117,10 +117,12 @@ public class BaseController {
         return dtos.isEmpty() ? ResponseEntity.noContent().build() : ResponseEntity.ok(dtos);
     }
 
-    @PostMapping("/appointment")
+    @PreAuthorize("hasRole('DONOR')")
+    @PostMapping("/make-appointment")
     public ResponseEntity<AppointmentResponse> appointment(@RequestBody @Valid AppointmentRequest appointmentRequest) {
         final AppointmentResponse response = baseService.makeAppointment(appointmentRequest);
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
+
 
 }

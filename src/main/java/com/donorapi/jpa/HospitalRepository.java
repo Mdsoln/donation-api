@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface HospitalRepository extends JpaRepository<Hospital, Integer> {
+public interface HospitalRepository extends JpaRepository<Hospital, Long> {
 
     Optional<Hospital> findByHospitalName(String hospitalName);
 

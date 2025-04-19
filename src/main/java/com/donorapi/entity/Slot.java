@@ -23,7 +23,7 @@ import java.util.List;
 public class Slot {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    private Long id;
 
     @ManyToOne
     @JoinColumn(name = "hospital_id", nullable = false)

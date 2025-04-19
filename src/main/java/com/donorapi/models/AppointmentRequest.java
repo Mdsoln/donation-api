@@ -14,11 +14,11 @@ import lombok.Setter;
 public class AppointmentRequest {
     @NotNull(message = "Hospital ID is required")
     @Min(value = 1, message = "Invalid Hospital ID")
-    private int hospitalId;
+    private long hospitalId;
 
     @NotNull(message = "Slot ID is required")
     @Min(value = 1, message = "Invalid Slot ID")
-    private int slotId;
+    private long slotId;
 
     @NotNull(message = "Donor ID is required")
     @Min(value = 1, message = "Invalid Donor ID")
