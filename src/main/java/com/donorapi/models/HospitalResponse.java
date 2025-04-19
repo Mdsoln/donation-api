@@ -8,7 +8,7 @@ import lombok.*;
 @Getter
 @Builder
 public class HospitalResponse {
-    private Integer id;
+    private Long id;
     private String hospitalName;
     private String hospitalAddress;
 }

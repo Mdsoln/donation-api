@@ -12,8 +12,8 @@ import java.time.LocalDateTime;
 @Setter
 @Getter
 public class SlotDto {
-     private int slotId;
-     private int hospitalId;
+     private long slotId;
+     private long hospitalId;
      private LocalDateTime startTime;
      private LocalDateTime endTime;
      private int availableBookings;

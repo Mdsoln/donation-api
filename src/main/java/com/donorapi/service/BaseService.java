@@ -162,7 +162,7 @@ public class BaseService {
         return ResponseEntity.ok(response);
     }
 
-    public List<SlotDto> getAvailableSlotsByHospitalId(Integer hospitalId) {
+    public List<SlotDto> getAvailableSlotsByHospitalId(Long hospitalId) {
         log.debug("start.....................................");
         List<Slot> slots = slotsRepository.findSlotsByHospitalId(hospitalId);
         LocalDateTime now = LocalDateTime.now();
