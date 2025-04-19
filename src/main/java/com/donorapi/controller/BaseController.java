@@ -4,6 +4,7 @@ import com.donorapi.entity.Hospital;
 import com.donorapi.jpa.HospitalRepository;
 import com.donorapi.models.*;
 import com.donorapi.service.BaseService;
+import com.donorapi.service.HospitalServiceImpl;
 import com.donorapi.service.LocationService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
@@ -11,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -30,6 +32,7 @@ import java.util.List;
 public class BaseController {
 
     private final BaseService baseService;
+    private final HospitalServiceImpl hospitalService;
     private final LocationService locationService;
     private final HospitalRepository hospitalRepository;
 
@@ -117,10 +120,23 @@ public class BaseController {
         return dtos.isEmpty() ? ResponseEntity.noContent().build() : ResponseEntity.ok(dtos);
     }
 
-    @PostMapping("/appointment")
+    @PostMapping("/make-appointment")
     public ResponseEntity<AppointmentResponse> appointment(@RequestBody @Valid AppointmentRequest appointmentRequest) {
         final AppointmentResponse response = baseService.makeAppointment(appointmentRequest);
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @PostMapping("/appointments/{appointmentId}/approval")
+    public ResponseEntity<String> approveAppointment(@PathVariable Long appointmentId) {
+        if (appointmentId == null) {
+            throw new IllegalArgumentException("Appointment id cannot be null");
+        }
+        hospitalService.approveAppointment(appointmentId);
+        return ResponseEntity.ok("Successfully approved appointment");
+    }
+
+    @GetMapping("/hopsital/{hopsitalId}/donors")
+    public
 
 }

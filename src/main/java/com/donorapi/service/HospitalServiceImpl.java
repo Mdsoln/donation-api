@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 
+import com.donorapi.exception.InvalidAppointmentStatusException;
 import com.donorapi.models.HospitalAppointment;
 import com.donorapi.utilities.DateFormatter;
 import org.springframework.stereotype.Service;
@@ -32,16 +33,16 @@ public class HospitalServiceImpl {
     public void approveAppointment(Long appointmentId){
         Appointment appointment = appointmentRepository.findById(appointmentId)
                .orElseThrow(()-> new EntityNotFoundException("No match appointment with appointment ID provided"));
-        log.debug("start...................................");
+        log.debug("Approving appointment with ID: {}", appointmentId);
         if (!appointment.hasPendingStatus()) {
-            throw new IllegalArgumentException("Only pending appointments can be approved");
+            throw new InvalidAppointmentStatusException("Only pending appointments can be approved");
         } 
 
         final LocalDateTime changed = LocalDateTime.now();
         appointment.setStatus(AppointmentStatus.SCHEDULED);
         appointment.setStatusChangedAt(changed);
         appointmentRepository.save(appointment);
-        log.debug("status changes successfully..............");
+        log.debug("Appointment status changed to SCHEDULED at {}", changed);
     }
 
     public List<HospitalDonors> findDonorsByHospital(Long hospitalId) {
