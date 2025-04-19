@@ -70,7 +70,7 @@ public class HospitalServiceImpl {
         return donationRepository.findTopDonorsByHospital(hospitalId);
     }
 
-    public List<HospitalAppointment> findAppointmentsByHospital(Integer hospitalId){
+    public List<HospitalAppointment> findAppointmentsByHospital(Long hospitalId){
         List<Appointment> appointments = appointmentRepository.findAppointmentsBySlot_Hospital_HospitalId(hospitalId);
         if (appointments == null || appointments.isEmpty()) {
             return Collections.emptyList();
