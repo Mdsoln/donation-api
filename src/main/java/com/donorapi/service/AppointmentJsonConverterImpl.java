@@ -4,23 +4,26 @@ import com.donorapi.entity.Appointment;
 import com.donorapi.entity.Hospital;
 import com.donorapi.entity.Slot;
 import com.donorapi.models.AppointmentResponse;
+import com.donorapi.models.HospitalResponse;
+import com.donorapi.utilities.DateFormatter;
+
+import lombok.RequiredArgsConstructor;
+
 import org.springframework.stereotype.Component;
 
-import java.time.format.DateTimeFormatter;
 
 @Component
+@RequiredArgsConstructor
 public class AppointmentJsonConverterImpl implements AppointmentMapper{
-    private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("EEEE, d MMM, yyyy");
-    private static final DateTimeFormatter TIME_FORMATTER = DateTimeFormatter.ofPattern("HH:mm");
+    private final DateFormatter dateFormatter;
 
     @Override
     public AppointmentResponse convertToResponse(Appointment appointment, int total, int attended, int expired) {
         Slot slot = appointment.getSlot();
         Hospital hospital = slot.getHospital();
 
-        String date = slot.getStartTime().format(DATE_FORMATTER);
-        String timeRange = slot.getStartTime().toLocalTime().format(TIME_FORMATTER)
-                + " - " + slot.getEndTime().toLocalTime().format(TIME_FORMATTER);
+        String date = dateFormatter.formatDate(slot.getStartTime());
+        String timeRange = dateFormatter.formatTimeRange(slot.getStartTime(), slot.getEndTime());
         String status = switch (appointment.getStatus()) {
             case COMPLETED -> "Attended";
             case OVERDUE -> "Expired";
@@ -30,8 +33,11 @@ public class AppointmentJsonConverterImpl implements AppointmentMapper{
         };
 
         return new AppointmentResponse(
-                hospital.getHospitalName(),
-                hospital.getHospitalAddress(),
+                HospitalResponse.builder()
+                        .id(hospital.getHospitalId())
+                        .hospitalName(hospital.getHospitalName())
+                        .hospitalAddress(hospital.getHospitalAddress())
+                        .build(),
                 date,
                 timeRange,
                 status,

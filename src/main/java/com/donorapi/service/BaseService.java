@@ -4,16 +4,19 @@ import com.donorapi.entity.*;
 import com.donorapi.exception.DonationEligibilityException;
 import com.donorapi.exception.OverBookingException;
 import com.donorapi.jpa.*;
-import com.donorapi.models.UserRoles;
 import com.donorapi.exception.EmailExistsException;
 import com.donorapi.exception.HospitalFoundException;
 import com.donorapi.jwt.service.JwtService;
 import com.donorapi.models.*;
+import com.donorapi.utilities.DateFormatter;
+
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
@@ -45,8 +48,9 @@ public class BaseService {
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
     private final AppointmentJsonConverterImpl converter;
+    private final DateFormatter formatter;
 
-    public ResponseEntity<DonorResponse> registerDonor(DonorRegistrationRequest donorRequest) {
+    public ResponseEntity<String> registerDonor(DonorRegistrationRequest donorRequest) {
 
         donorRepository.findByEmail(donorRequest.getEmail()).ifPresent(donor -> {
             throw new EmailExistsException("EMAIL_ALREADY_EXISTS", "A donor with this email already exists.");
@@ -64,11 +68,10 @@ public class BaseService {
         donor.setPhone(donorRequest.getPhone());
         donorRepository.save(donor);
 
-        return new ResponseEntity<>(new DonorResponse(
-                donor.getDonorId(), donor.getEmail(), donor.getPhone()), HttpStatus.CREATED);
+        return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
-    public ResponseEntity<HospitalResponse> registerHospital(HospitalRegistrationRequest hospitalRequest) {
+    public ResponseEntity<String> registerHospital(HospitalRegistrationRequest hospitalRequest) {
 
         hospitalRepository.findByHospitalName(hospitalRequest.getHospitalName()).ifPresent(hospital -> {
             throw new HospitalFoundException("Hospital already exists");
@@ -85,51 +88,46 @@ public class BaseService {
         hospital.setHospitalAddress(hospitalRequest.getHospitalAddress());
         hospital.setHospitalCity(hospitalRequest.getHospitalCity());
         hospitalRepository.save(hospital);
-        return new ResponseEntity<>(
-                new HospitalResponse(hospital.getHospitalId(), hospital.getHospitalName(), hospital.getHospitalAddress(),
-                        hospital.getHospitalCity()), HttpStatus.CREATED
-        );
+        return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
     public ResponseEntity<AuthResponse> authenticateUser(AuthRequest request){
         return userRepository.findByUsername(request.getUsername())
                 .map(user -> {
+                    log.debug("start.............................authenticating");
                     if (!passwordEncoder.matches(request.getPassword(),user.getPassword())) {
-                        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                                .body(new AuthResponse("Invalid credentials", null, null, null, null, null,null));
+                        throw new UsernameNotFoundException("Invalid username or password");
                     }
-                    //Donor
-                    Donor donor = donorRepository.findByUser(user).orElse(null);
-                    //Hospital
-                    Hospital hospital = hospitalRepository.findByUser(user).orElse(null);
 
-                    var token = jwtService.generateToken(user);
+                    final Donor donor = donorRepository.findByUser(user).orElse(null);
+                    assert donor != null;
+                    log.debug("Donor fetched successfuly..................");
+                    final String formattedFirstName = extractFirstName(donor.getFullName());
+                    final String image = buildImagePath(donor.getImage());
+                    final String picture = buildImagePath(image);
 
-                    AuthResponse.AuthResponseBuilder response = AuthResponse.builder()
+                    final int donations = donorRepository.countByAppointmentDonor(donor);
+                    final Optional<Appointment> upcomingAppointmentOpt = appointmentRepository.findByDonorAndStatusOrderBySlotEndTimeDesc(donor, AppointmentStatus.SCHEDULED);
+                    final AppointmentCard latestAppointment = upcomingAppointmentOpt.map(this::mapToAppointmentCard).orElse(null);
+
+                    Map<String, Object> extraClaims = new HashMap<>(3);
+                    extraClaims.put("userId", donor.getDonorId());
+                    extraClaims.put("roles", user.getAuthorities());
+                    var token = jwtService.generateToken(extraClaims, user);
+
+                    log.debug("end.......................authentication");
+                    AuthResponse response = AuthResponse.builder()
                             .message("Successfully logged in")
                             .token(token)
-                            .username(user.getUsername())
-                            .roles(user.getRoles().name());
-
-                    if(donor != null){
-                        response.email(donor.getEmail())
-                                .phone(donor.getPhone());
-                    }else if(hospital != null){
-                        response.email(hospital.getHospitalName())
-                                .hospital(
-                                        HospitalResponse.builder()
-                                                .hospitalName(hospital.getHospitalName())
-                                                .hospitalAddress(hospital.getHospitalAddress())
-                                                .hospitalCity(hospital.getHospitalCity())
-                                                .build()
-                                );
-                    }
-
-                    return ResponseEntity.ok(response.build());
+                            .username(formattedFirstName)
+                            .bloodGroup(donor.getBloodType())
+                            .picture(picture)
+                            .donations(donations)
+                            .latestAppointment(latestAppointment)
+                            .build();
+                    return ResponseEntity.ok(response);
                 })
-                .orElse(ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                        .body(new AuthResponse("User not found", null, null, null, null, null,null))
-                );
+                .orElseThrow(()-> new EntityNotFoundException("User not found"));
     }
 
     public ResponseEntity<ProfileResponse> updateProfile(Integer donorId, ProfileRequest request) throws IOException{
@@ -300,6 +298,39 @@ public class BaseService {
           Files.copy(image.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
 
           return imageName;
+    }
+
+    private String extractFirstName(String fullName) {
+        if (fullName == null || fullName.isBlank()) return "User";
+        String firstName = fullName.split(" ")[0];
+        return firstName.substring(0, 1).toUpperCase() + firstName.substring(1).toLowerCase();
+    }
+
+    private String buildImagePath(String imageName) {
+        return "/images/" + imageName;
+    }
+
+    private AppointmentCard mapToAppointmentCard(Appointment appointment) {
+        LocalDate appointmentDate = appointment.getAppointmentDate();
+        int daysToGo = Period.between(LocalDate.now(), appointmentDate).getDays();
+    
+        Slot slot = appointment.getSlot();
+        Hospital hospital = slot.getHospital();
+    
+        return AppointmentCard.builder()
+                .hospital(mapToHospitalResponse(hospital))
+                .date(formatter.formatDate(slot.getStartTime()))
+                .timeRange(formatter.formatTimeRange(slot.getStartTime(), slot.getEndTime()))
+                .dayToGo(daysToGo)
+                .build();
+    }
+
+    private HospitalResponse mapToHospitalResponse(Hospital hospital) {
+        return HospitalResponse.builder()
+                .id(hospital.getHospitalId())
+                .hospitalName(hospital.getHospitalName())
+                .hospitalAddress(hospital.getHospitalAddress())
+                .build();
     }
 
 }

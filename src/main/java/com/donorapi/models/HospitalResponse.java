@@ -11,5 +11,4 @@ public class HospitalResponse {
     private Integer id;
     private String hospitalName;
     private String hospitalAddress;
-    private String hospitalCity;
 }
