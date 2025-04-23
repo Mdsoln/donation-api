@@ -2,6 +2,7 @@ package com.donorapi.controller;
 
 
 import com.donorapi.jpa.HospitalRepository;
+import com.donorapi.models.HospitalAppointment;
 import com.donorapi.models.HospitalDonors;
 import com.donorapi.models.HospitalRegistrationRequest;
 import com.donorapi.service.BaseService;
@@ -26,13 +27,13 @@ public class HospitalController {
     private final HospitalServiceImpl hospitalService;
     private final HospitalRepository hospitalRepository;
 
-    @PreAuthorize("hasRole('HOSPITAL')")
+    //@PreAuthorize("hasRole('HOSPITAL')")
     @PostMapping("/register-hospital")
     public ResponseEntity<String> registerHospital(@RequestBody HospitalRegistrationRequest hospitalRequest) {
         return baseService.registerHospital(hospitalRequest);
     }
 
-    @PreAuthorize("hasRole('HOSPITAL')")
+    //@PreAuthorize("hasRole('HOSPITAL')")
     @PostMapping("/appointments/{appointmentId}/approval")
     public ResponseEntity<String> approveAppointment(@PathVariable Long appointmentId) {
         if (appointmentId == null) {
@@ -42,7 +43,7 @@ public class HospitalController {
         return ResponseEntity.ok("Successfully approved appointment");
     }
 
-    @PreAuthorize("hasRole('HOSPITAL')")
+    //@PreAuthorize("hasRole('HOSPITAL')")
     @GetMapping("/hopsital/{hospitalId}/donors")
     public ResponseEntity<List<HospitalDonors>> getDonorsPerHospital(@PathVariable("hospitalId") Long hospitalId) {
         if (hospitalId == null) {
@@ -52,5 +53,22 @@ public class HospitalController {
         return ResponseEntity.ok(hospitalDonors);
     }
 
+    @GetMapping("/hospital/{hospitalId}/topdonors")
+    public ResponseEntity<List<HospitalDonors>> getTopDonorsPerHospital(@PathVariable("hospitalId") Long hospitalId) {
+        if (hospitalId == null) {
+            throw new IllegalArgumentException("Appointment id cannot be null");
+        }
+        final List<HospitalDonors> topDonors = hospitalService.findTopDonorsByHospital(hospitalId);
+        return ResponseEntity.ok(topDonors);
+    }
+
+    @GetMapping("/hospital/{hospitalId}/appointments")
+    public ResponseEntity<List<HospitalAppointment>> getAppointmentsPerHospital(@PathVariable("hospitalId") Long hospitalId) {
+        if (hospitalId == null) {
+            throw new IllegalArgumentException("Appointment id cannot be null");
+        }
+        final List<HospitalAppointment> appointments = hospitalService.findAppointmentsByHospital(hospitalId);
+        return ResponseEntity.ok(appointments);
+    }
 
 }
