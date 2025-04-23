@@ -31,6 +31,13 @@ public class SecurityConfig {
             "/swagger-resource"
     };
 
+    private static final String[] AUTH_WHITELIST = {
+            "/api/v1/donor/register-donor",
+            "/api/v1/donor/register-hospital",
+            "/api/v1/donor/login"
+    };
+
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
@@ -38,8 +45,7 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(SWAGGER_WHITELIST).permitAll()
-                        .requestMatchers("/api/v1/donorapp/register-donor", "/api/v1/donorapp/register-hospital").permitAll()
-                        .requestMatchers("/api/v1/donorapp/login").permitAll()
+                        .requestMatchers(AUTH_WHITELIST).permitAll()
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session
@@ -55,7 +61,7 @@ public class SecurityConfig {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowedOrigins(List.of(
                 "http://localhost:3000",  // Flutter Web
-                "http://192.168.28.49 :3000"  //local network IP
+                "http://192.168.28.49:3000"  //local network IP
         ));
 
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));

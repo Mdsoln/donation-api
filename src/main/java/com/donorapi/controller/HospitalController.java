@@ -10,7 +10,6 @@ import com.donorapi.service.HospitalServiceImpl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -27,13 +26,12 @@ public class HospitalController {
     private final HospitalServiceImpl hospitalService;
     private final HospitalRepository hospitalRepository;
 
-    //@PreAuthorize("hasRole('HOSPITAL')")
+
     @PostMapping("/register-hospital")
     public ResponseEntity<String> registerHospital(@RequestBody HospitalRegistrationRequest hospitalRequest) {
         return baseService.registerHospital(hospitalRequest);
     }
 
-    //@PreAuthorize("hasRole('HOSPITAL')")
     @PostMapping("/appointments/{appointmentId}/approval")
     public ResponseEntity<String> approveAppointment(@PathVariable Long appointmentId) {
         if (appointmentId == null) {
@@ -43,7 +41,7 @@ public class HospitalController {
         return ResponseEntity.ok("Successfully approved appointment");
     }
 
-    //@PreAuthorize("hasRole('HOSPITAL')")
+
     @GetMapping("/hopsital/{hospitalId}/donors")
     public ResponseEntity<List<HospitalDonors>> getDonorsPerHospital(@PathVariable("hospitalId") Long hospitalId) {
         if (hospitalId == null) {
@@ -61,6 +59,7 @@ public class HospitalController {
         final List<HospitalDonors> topDonors = hospitalService.findTopDonorsByHospital(hospitalId);
         return ResponseEntity.ok(topDonors);
     }
+
 
     @GetMapping("/hospital/{hospitalId}/appointments")
     public ResponseEntity<List<HospitalAppointment>> getAppointmentsPerHospital(@PathVariable("hospitalId") Long hospitalId) {

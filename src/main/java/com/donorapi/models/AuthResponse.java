@@ -15,4 +15,8 @@ public class AuthResponse {
     private int donations;
     private String picture;
     private AppointmentCard latestAppointment;
+
+    public AuthResponse(String s) {
+        this.token = s;
+    }
 }
