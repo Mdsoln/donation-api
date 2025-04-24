@@ -103,12 +103,13 @@ public class BaseService {
                     assert donor != null;
                     log.debug("Donor fetched successfully..................");
                     final String formattedFirstName = extractFirstName(donor.getFullName());
-                    //final String image = buildImagePath(donor.getImage());
                     final String picture = buildImagePath(donor.getImage());
 
                     final int donations = donorRepository.countByAppointmentDonor(donor);
                     final Optional<Appointment> upcomingAppointmentOpt = appointmentRepository.findByDonorAndStatusOrderBySlotEndTimeDesc(donor, AppointmentStatus.SCHEDULED);
+                    log.debug("upcoming appointment {}", upcomingAppointmentOpt);
                     final AppointmentCard latestAppointment = upcomingAppointmentOpt.map(this::mapToAppointmentCard).orElse(null);
+                    log.debug("Appointment {}",latestAppointment);
 
                     Map<String, Object> extraClaims = new HashMap<>(3);
                     extraClaims.put("userId", donor.getDonorId());
