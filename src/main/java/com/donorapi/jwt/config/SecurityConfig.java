@@ -34,7 +34,8 @@ public class SecurityConfig {
     private static final String[] AUTH_WHITELIST = {
             "/api/v1/donor/register-donor",
             "/api/v1/donor/register-hospital",
-            "/api/v1/donor/login"
+            "/api/v1/donor/login",
+            "/**"
     };
 
 

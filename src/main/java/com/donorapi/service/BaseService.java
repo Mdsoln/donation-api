@@ -103,7 +103,7 @@ public class BaseService {
                     assert donor != null;
                     log.debug("Donor fetched successfully..................");
                     final String formattedFirstName = extractFirstName(donor.getFullName());
-                    final String picture = buildImagePath(donor.getImage());
+                    final String picture = donor.getImage();
 
                     final int donations = donorRepository.countByAppointmentDonor(donor);
                     final Optional<Appointment> upcomingAppointmentOpt = appointmentRepository.findByDonorAndStatusOrderBySlotEndTimeDesc(donor, AppointmentStatus.SCHEDULED);
@@ -292,7 +292,7 @@ public class BaseService {
             throw new IllegalArgumentException("Invalid filename generated.");
         }
 
-        Path uploadPath = Paths.get(System.getProperty("user.home"), "uploads", "profile-images");
+        Path uploadPath = Paths.get(System.getProperty("src/main/resources/static/"), "uploads", "profile-images");
         if (!Files.exists(uploadPath)) {
             Files.createDirectories(uploadPath);
         }
@@ -312,10 +312,6 @@ public class BaseService {
         if (fullName == null || fullName.isBlank()) return "User";
         String firstName = fullName.split(" ")[0];
         return firstName.substring(0, 1).toUpperCase() + firstName.substring(1).toLowerCase();
-    }
-
-    private String buildImagePath(String imageName) {
-        return "/images/" + imageName;
     }
 
     private AppointmentCard mapToAppointmentCard(Appointment appointment) {
