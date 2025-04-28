@@ -8,6 +8,7 @@ import org.springframework.data.repository.query.Param;
 import com.donorapi.entity.Donation;
 import com.donorapi.entity.Donor;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 public interface DonationRepository extends JpaRepository<Donation,Integer> {
@@ -34,5 +35,9 @@ public interface DonationRepository extends JpaRepository<Donation,Integer> {
     """)
     List<HospitalDonors> findTopDonorsByHospital(@Param("hospitalId") Long hospitalId);
 
+    @Query("SELECT d.donationDate FROM Donation d " +
+            "WHERE d.appointment.donor.donorId = :donorId " +
+            "ORDER BY d.donationDate DESC")
+    LocalDateTime findTopByDonorIdOrderByDonationDateDesc(@Param("donorId") Integer donorId);
 
 }
