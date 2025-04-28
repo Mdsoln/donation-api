@@ -30,6 +30,7 @@ import java.nio.file.StandardCopyOption;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.Period;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -48,7 +49,8 @@ public class BaseService {
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
     private final AppointmentJsonConverterImpl converter;
-    
+    private final DonationRepository donationRepository;
+
 
     public ResponseEntity<String> registerDonor(DonorRegistrationRequest donorRequest) {
 
@@ -91,6 +93,7 @@ public class BaseService {
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
+    // TODO: 4/28/25 track blood requests and attended ones. 
     public ResponseEntity<AuthResponse> authenticateUser(AuthRequest request){
         return userRepository.findByUsername(request.getUsername())
                 .map(user -> {
@@ -103,8 +106,23 @@ public class BaseService {
                     assert donor != null;
                     log.debug("Donor fetched successfully..................");
                     final String formattedFirstName = extractFirstName(donor.getFullName());
-                    final String picture = donor.getImage();
+                    final String dob = formateDateOfBirth(donor.getBirthDate());
 
+                    LocalDateTime donationDateTime = donationRepository.findTopByDonorIdOrderByDonationDateDesc(donor.getDonorId());
+                    LocalDate lastDonationDate = donationDateTime != null ? donationDateTime.toLocalDate() : null;
+                    String lastDonation;
+                    if (lastDonationDate != null) {
+                        lastDonation = formatLastDonation(lastDonationDate);
+                    } else {
+                        lastDonation = getMotivationalMessage();
+                    }
+                    final String picture = donor.getImage();
+                    final String bloodType = donor.getBloodType();
+                    final String mobile = donor.getPhone();
+                    final double height = donor.getHeight();
+                    final double weight = donor.getWeight();
+                    final String gender = donor.getGender();
+                    
                     final int donations = donorRepository.countByAppointmentDonor(donor);
                     final Optional<Appointment> upcomingAppointmentOpt = appointmentRepository.findByDonorAndStatusOrderBySlotEndTimeDesc(donor, AppointmentStatus.SCHEDULED);
                     log.debug("upcoming appointment {}", upcomingAppointmentOpt);
@@ -121,15 +139,47 @@ public class BaseService {
                             .message("Successfully logged in")
                             .token(token)
                             .username(formattedFirstName)
-                            .bloodGroup(donor.getBloodType())
+                            .bloodGroup(bloodType)
                             .picture(picture)
                             .donations(donations)
+                            .mobile(mobile)
+                            .dateOfBirth(dob)
+                            .height(height)
+                            .weight(weight)
+                            .gender(gender)
+                            .lastDonation(lastDonation)
                             .latestAppointment(latestAppointment)
                             .build();
                     return ResponseEntity.ok(response);
                 })
                 .orElseThrow(()-> new EntityNotFoundException("User not found"));
     }
+
+    private String formateDateOfBirth(LocalDate birthDate) {
+        if (birthDate == null) {
+            return "N/A";
+        }
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd MMM, yyyy");
+        return birthDate.format(formatter);
+    }
+
+    private String formatLastDonation(LocalDate lastDonationDate) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MMM, yyyy");
+        return lastDonationDate.format(formatter);
+    }
+
+    private static final List<String> MOTIVATIONAL_MESSAGES = Arrays.asList(
+            "No donations yet. Your first donation can save lives!",
+            "Be a hero today. Start your donation journey!",
+            "One donation can save up to three lives. Will you be the one?",
+            "You are needed more than ever. Give blood. Save lives."
+    );
+
+    private String getMotivationalMessage() {
+        Random random = new Random();
+        return MOTIVATIONAL_MESSAGES.get(random.nextInt(MOTIVATIONAL_MESSAGES.size()));
+    }
+
 
     public ResponseEntity<ProfileResponse> updateProfile(Integer donorId, ProfileRequest request) throws IOException{
         Donor donor = donorRepository.findByDonorId(donorId)

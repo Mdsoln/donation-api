@@ -14,6 +14,12 @@ public class AuthResponse {
     private String bloodGroup;
     private int donations;
     private String picture;
+    private String gender;
+    private String dateOfBirth;
+    private String mobile;
+    private double height;
+    private double weight;
+    private String lastDonation;// Dec 2024
     private AppointmentCard latestAppointment;
 
     public AuthResponse(String s) {
