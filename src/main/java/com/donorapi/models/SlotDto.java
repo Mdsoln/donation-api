@@ -16,5 +16,6 @@ public class SlotDto {
      private long hospitalId;
      private LocalDateTime startTime;
      private LocalDateTime endTime;
+     private int maxCapacity;
      private int availableBookings;
 }
