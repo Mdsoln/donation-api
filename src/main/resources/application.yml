@@ -34,9 +34,9 @@ spring:
     activate:
       on-profile: prod
   datasource:
-    url: ${DATABASE_URL}
-    username: ${DATABASE_USERNAME}
-    password: ${DATABASE_PASSWORD}
+    url: jdbc:postgresql://postgres.railway.internal:5432/donation
+    username: postgres
+    password: MjiiJDIRCbotwtkXiUhXuZhKOeyQnmoO
     driver-class-name: org.postgresql.Driver
   jpa:
     hibernate:
