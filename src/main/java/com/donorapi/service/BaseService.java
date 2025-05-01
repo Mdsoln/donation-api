@@ -315,6 +315,7 @@ public class BaseService {
                 slot.getHospital().getHospitalId(),
                 slot.getStartTime(),
                 slot.getEndTime(),
+                slot.getMaxCapacity(),
                 slot.getMaxCapacity() - slot.getCurrentBookings()
         );
     }
