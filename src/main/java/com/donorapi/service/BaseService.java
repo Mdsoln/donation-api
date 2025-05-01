@@ -280,11 +280,13 @@ public class BaseService {
             throw new DonationEligibilityException("You already have an active blood donation appointment.");
         }
 
+        log.debug("last..............donation...............check.........");
         final LocalDate today = LocalDate.now();
         final Optional<Appointment> lastDonation = appointmentRepository.findByDonorAndStatusOrderBySlotEndTimeDesc(
                 donor, AppointmentStatus.COMPLETED);
 
         if (lastDonation.isPresent()) {
+            log.debug("last donation found: {}", lastDonation.get().getSlot().getEndTime());
             final LocalDate lastDonationDate = lastDonation.get().getSlot().getEndTime().toLocalDate();
 
             if (lastDonationDate.isAfter(today)) {
@@ -292,7 +294,7 @@ public class BaseService {
                         "You have a scheduled donation on " + lastDonationDate +
                                 ". Please complete or cancel it before booking a new appointment.");
             }
-
+            log.debug("three.............Months............donation.............check.........");
             LocalDate threeMonthsAfterDonation = lastDonationDate.plusMonths(3);
             if (today.isBefore(threeMonthsAfterDonation)) {
                 Period remainingWait = Period.between(today, threeMonthsAfterDonation);
@@ -302,6 +304,8 @@ public class BaseService {
                                 remainingWait.getDays() + " days.");
             }
         }
+
+        log.debug("same..........day...........donation...............check.........");
         boolean hasSameDayAppointment = activeAppointments.stream()
                 .anyMatch(a -> a.getAppointmentDate().equals(today));
         if (hasSameDayAppointment) {
