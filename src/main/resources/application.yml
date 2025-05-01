@@ -2,7 +2,7 @@ spring:
     application:
          name: donor-api
     profiles:
-         active: dev
+         active: prod
 
 ---
 spring:
