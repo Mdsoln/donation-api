@@ -269,7 +269,7 @@ public class BaseService {
         appointment.setSlot(slot);
         appointment.setAppointmentDate(appointmentDate);
         appointment.setDescription(AppointmentDescription.APPOINTMENT_DESCRIPTION);
-        appointment.setStatus(AppointmentStatus.PENDING);
+        appointment.setStatus(AppointmentStatus.SCHEDULED);
         return appointment;
     }
 
