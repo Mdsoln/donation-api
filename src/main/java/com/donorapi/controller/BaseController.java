@@ -54,7 +54,7 @@ public class BaseController {
     public ResponseEntity<ProfileResponse> updateProfile(
             @PathVariable("donor-id") Integer parameter, @RequestParam(name = "fullname") String fullname, @RequestParam(name = "email") String email,
             @RequestParam(name = "phone") String phone, @RequestParam(name = "gender") String gender, @RequestParam(name = "birthdate") LocalDate birthdate,
-            @RequestParam(name = "height") double height, @RequestParam(name = "weight") double weight, @RequestParam(name = "profileImage") MultipartFile profileImage
+            @RequestParam(name = "height") double height, @RequestParam(name = "weight") double weight, @RequestParam(name = "profileImage", required = false) MultipartFile profileImage
     ) throws IOException {
 
         if (birthdate.isAfter(LocalDate.now())) {
@@ -71,6 +71,7 @@ public class BaseController {
                 .weight(weight)
                 .profileImage(profileImage)
                 .build();
+        log.debug("Received payload: {}",request);
         return baseService.updateProfile(parameter, request);
 
     }

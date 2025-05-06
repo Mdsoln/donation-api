@@ -93,7 +93,6 @@ public class BaseService {
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
-    // TODO: 4/28/25 track blood requests and attended ones. 
     public ResponseEntity<AuthResponse> authenticateUser(AuthRequest request){
         return userRepository.findByUsername(request.getUsername())
                 .map(user -> {
@@ -117,6 +116,7 @@ public class BaseService {
                         lastDonation = getMotivationalMessage();
                     }
                     final String picture = donor.getImage();
+                    log.debug("image name: {}",picture);
                     final String bloodType = donor.getBloodType();
                     final String mobile = donor.getPhone();
                     final double height = donor.getHeight();
@@ -326,9 +326,9 @@ public class BaseService {
 
     private void validateImageType(MultipartFile image) {
         String contentType = image.getContentType();
+        System.out.println("Uploaded image type: " + contentType);
         if (contentType == null || (!contentType.equals("image/png") &&
-                !contentType.equals("image/jpeg") &&
-                !contentType.equals("image/jpg"))) {
+                !contentType.equals("image/jpeg"))) {
             throw new IllegalArgumentException("Invalid image format. Only PNG, JPG, and JPEG are allowed.");
         }
     }
@@ -337,23 +337,18 @@ public class BaseService {
         String originalFilename = image.getOriginalFilename();
         assert FilenameUtils.getExtension(originalFilename) != null;
         String fileExtension = FilenameUtils.getExtension(originalFilename).toLowerCase();
-
         if (!List.of("jpg", "jpeg", "png").contains(fileExtension)) {
             throw new IllegalArgumentException("Invalid file type");
         }
 
         String imageName = UUID.randomUUID() + "." + fileExtension;
-        if (imageName.contains("..") || imageName.contains("/") || imageName.contains("\\")) {
-            throw new IllegalArgumentException("Invalid filename generated.");
-        }
-
-        Path uploadPath = Paths.get(System.getProperty("src/main/resources/static/"), "uploads", "profile-images");
+        Path uploadPath = Paths.get("src/main/resources/static");
         if (!Files.exists(uploadPath)) {
             Files.createDirectories(uploadPath);
         }
 
         Path filePath = uploadPath.resolve(imageName);
-        if (!filePath.startsWith(uploadPath)) {
+        if (!filePath.normalize().startsWith(uploadPath)) {
             throw new SecurityException("Detected attempt to write outside the upload directory");
         }
 
@@ -361,7 +356,6 @@ public class BaseService {
 
         return imageName;
     }
-
 
     private String extractFirstName(String fullName) {
         if (fullName == null || fullName.isBlank()) return "User";
