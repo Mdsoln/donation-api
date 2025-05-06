@@ -93,7 +93,6 @@ public class BaseService {
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
-    // TODO: 4/28/25 track blood requests and attended ones. 
     public ResponseEntity<AuthResponse> authenticateUser(AuthRequest request){
         return userRepository.findByUsername(request.getUsername())
                 .map(user -> {
