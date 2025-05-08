@@ -24,6 +24,7 @@ services:
       SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/donation
       SPRING_DATASOURCE_USERNAME: postgres
       SPRING_DATASOURCE_PASSWORD: mdsoln
+      SPRING_PROFILES_ACTIVE: docker
     networks:
       - backend_network
 
