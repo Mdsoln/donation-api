@@ -4,47 +4,7 @@ spring:
     profiles:
          active: dev
 
----
-spring:
-  config:
-    activate:
-      on-profile: dev
-  datasource:
-    url: jdbc:postgresql://localhost:5432/donation
-    username: postgres
-    password: mdsoln
-    driver-class-name: org.postgresql.Driver
-  jpa:
-    hibernate:
-      ddl-auto: update
-    database: postgresql
-    database-platform: org.hibernate.dialect.PostgreSQLDialect
-  task:
-    execution:
-       pool:
-          core-size: 5
-          max-size: 10
 logging:
   level:
     root: info
     com.donorapi: debug
----
-spring:
-  config:
-    activate:
-      on-profile: prod
-  datasource:
-    url: jdbc:postgresql://postgres.railway.internal:5432/donation
-    username: postgres
-    password: MjiiJDIRCbotwtkXiUhXuZhKOeyQnmoO
-    driver-class-name: org.postgresql.Driver
-  jpa:
-    hibernate:
-      ddl-auto: update
-    database: postgresql
-    database-platform: org.hibernate.dialect.PostgreSQLDialect
-  task:
-    execution:
-      pool:
-        core-size: 5
-        max-size: 10
