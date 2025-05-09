@@ -52,7 +52,7 @@ public class BaseService {
     private final DonationRepository donationRepository;
 
 
-    public ResponseEntity<String> registerDonor(DonorRegistrationRequest donorRequest) {
+    public ResponseEntity<Map<String, String>> registerDonor(DonorRegistrationRequest donorRequest) {
 
         donorRepository.findByEmail(donorRequest.getEmail()).ifPresent(donor -> {
             throw new EmailExistsException("EMAIL_ALREADY_EXISTS", "A donor with this email already exists.");
@@ -70,7 +70,9 @@ public class BaseService {
         donor.setPhone(donorRequest.getPhone());
         donorRepository.save(donor);
 
-        return new ResponseEntity<>(HttpStatus.CREATED);
+        Map<String, String> response = new HashMap<>();
+        response.put("message", "Donor registered successfully");
+        return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
     public ResponseEntity<String> registerHospital(HospitalRegistrationRequest hospitalRequest) {
