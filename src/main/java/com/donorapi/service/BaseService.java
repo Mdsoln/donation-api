@@ -121,6 +121,7 @@ public class BaseService {
                     log.debug("image name: {}",picture);
                     final String bloodType = donor.getBloodType();
                     final String mobile = donor.getPhone();
+                    final String email = donor.getEmail();
                     final double height = donor.getHeight();
                     final double weight = donor.getWeight();
                     final String gender = donor.getGender();
@@ -145,6 +146,7 @@ public class BaseService {
                             .picture(picture)
                             .donations(donations)
                             .mobile(mobile)
+                            .email(email)
                             .dateOfBirth(dob)
                             .height(height)
                             .weight(weight)
