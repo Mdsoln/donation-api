@@ -20,6 +20,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 
 
 @RestController
@@ -35,7 +36,7 @@ public class BaseController {
 
 
     @PostMapping("/register-donor")
-    public ResponseEntity<String> registerDonor(@RequestBody DonorRegistrationRequest donorRequest) {
+    public ResponseEntity<Map<String, String>> registerDonor(@RequestBody DonorRegistrationRequest donorRequest) {
        return baseService.registerDonor(donorRequest);
     }
 
