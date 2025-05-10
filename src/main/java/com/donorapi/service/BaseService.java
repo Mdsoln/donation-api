@@ -341,23 +341,21 @@ public class BaseService {
         String originalFilename = image.getOriginalFilename();
         assert FilenameUtils.getExtension(originalFilename) != null;
         String fileExtension = FilenameUtils.getExtension(originalFilename).toLowerCase();
+
         if (!List.of("jpg", "jpeg", "png").contains(fileExtension)) {
             throw new IllegalArgumentException("Invalid file type");
         }
 
         String imageName = UUID.randomUUID() + "." + fileExtension;
-        Path uploadPath = Paths.get("src/main/resources/static");
+        String UPLOAD_DIR = "uploads";
+        Path uploadPath = Paths.get(UPLOAD_DIR);
+
         if (!Files.exists(uploadPath)) {
             Files.createDirectories(uploadPath);
         }
 
         Path filePath = uploadPath.resolve(imageName);
-        if (!filePath.normalize().startsWith(uploadPath)) {
-            throw new SecurityException("Detected attempt to write outside the upload directory");
-        }
-
         Files.copy(image.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
-
         return imageName;
     }
 
