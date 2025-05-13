@@ -255,8 +255,9 @@ public class BaseService {
      final int total = appointmentRepository.countByDonor(donor);
      final int attended = appointmentRepository.countByDonorAndStatus(donor, AppointmentStatus.COMPLETED);
      final int expired = appointmentRepository.countByDonorAndStatus(donor, AppointmentStatus.OVERDUE);
+     final List<Appointment> allAppointments = appointmentRepository.findByDonorOrderByAppointmentDateDesc(donor);
      log.debug("end..........................appointment");
-     return converter.convertToResponse(appointment, total, attended, expired);
+     return converter.convertToResponse(allAppointments, total, attended, expired);
     }
 
     private Appointment getAppointment(AppointmentRequest request, Slot slot, Donor donor) {
