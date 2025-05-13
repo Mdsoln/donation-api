@@ -24,10 +24,10 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Long> 
 
     List<Appointment> findByStatusAndSlotEndTimeBefore(AppointmentStatus status, LocalDateTime slot_endTime);
 
-    Optional<Appointment> findFirstByDonorAndStatusOrderByAppointmentDateAsc(Donor donor, AppointmentStatus status);
-
     @Query("SELECT DISTINCT d FROM Appointment a JOIN a.donor d WHERE a.slot.hospital.hospitalId = :hospitalId")
     List<Donor> findDistinctDonorsByHospitalId(@Param("hospitalId") Long hospitalId);
 
     List<Appointment> findAppointmentsBySlot_Hospital_HospitalId(Long slotHospitalHospitalId);
+
+    List<Appointment> findByDonorOrderByAppointmentDateDesc(Donor donor);
 }
