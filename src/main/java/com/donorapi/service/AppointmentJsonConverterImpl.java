@@ -5,7 +5,6 @@ import com.donorapi.entity.Hospital;
 import com.donorapi.entity.Slot;
 import com.donorapi.models.AppointmentDetails;
 import com.donorapi.models.AppointmentResponse;
-import com.donorapi.models.HospitalResponse;
 import com.donorapi.utilities.DateFormatter;
 
 

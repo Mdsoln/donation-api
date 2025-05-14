@@ -120,10 +120,15 @@ public class BaseController {
 
 
     @PostMapping("/make-appointment")
-    public ResponseEntity<AppointmentResponse> appointment(@RequestBody @Valid AppointmentRequest appointmentRequest) {
-        final AppointmentResponse response = baseService.makeAppointment(appointmentRequest);
+    public ResponseEntity<String> appointment(@RequestBody @Valid AppointmentRequest appointmentRequest) {
+        final String response = baseService.makeAppointment(appointmentRequest);
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
-
+    @GetMapping("/appointments/{donor-id}")
+    public ResponseEntity<AppointmentResponse> getAppointments(@PathVariable("donor-id") Integer donorId) {
+        final AppointmentResponse response = baseService.getAppointmentHistory(donorId);
+        return response.getAppointments()
+                .isEmpty() ? ResponseEntity.noContent().build() : ResponseEntity.ok(response);
+    }
 }
