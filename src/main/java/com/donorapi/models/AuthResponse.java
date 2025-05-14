@@ -17,6 +17,7 @@ public class AuthResponse {
     private String gender;
     private String dateOfBirth;
     private String mobile;
+    private String email;
     private double height;
     private double weight;
     private String lastDonation;// Dec 2024

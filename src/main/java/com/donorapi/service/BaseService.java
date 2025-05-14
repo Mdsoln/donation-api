@@ -52,7 +52,7 @@ public class BaseService {
     private final DonationRepository donationRepository;
 
 
-    public ResponseEntity<String> registerDonor(DonorRegistrationRequest donorRequest) {
+    public ResponseEntity<Map<String, String>> registerDonor(DonorRegistrationRequest donorRequest) {
 
         donorRepository.findByEmail(donorRequest.getEmail()).ifPresent(donor -> {
             throw new EmailExistsException("EMAIL_ALREADY_EXISTS", "A donor with this email already exists.");
@@ -70,7 +70,9 @@ public class BaseService {
         donor.setPhone(donorRequest.getPhone());
         donorRepository.save(donor);
 
-        return new ResponseEntity<>(HttpStatus.CREATED);
+        Map<String, String> response = new HashMap<>();
+        response.put("message", "Donor registered successfully");
+        return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
     public ResponseEntity<String> registerHospital(HospitalRegistrationRequest hospitalRequest) {
@@ -119,6 +121,7 @@ public class BaseService {
                     log.debug("image name: {}",picture);
                     final String bloodType = donor.getBloodType();
                     final String mobile = donor.getPhone();
+                    final String email = donor.getEmail();
                     final double height = donor.getHeight();
                     final double weight = donor.getWeight();
                     final String gender = donor.getGender();
@@ -143,6 +146,7 @@ public class BaseService {
                             .picture(picture)
                             .donations(donations)
                             .mobile(mobile)
+                            .email(email)
                             .dateOfBirth(dob)
                             .height(height)
                             .weight(weight)
@@ -232,7 +236,7 @@ public class BaseService {
         return availableSlots;
     }
 
-    public AppointmentResponse makeAppointment(AppointmentRequest request){
+    public String makeAppointment(AppointmentRequest request){
      log.debug("create...................................appointment");
      final Donor donor = donorRepository.findByDonorId(request.getDonorId()).orElseThrow(
              ()-> new EntityNotFoundException("Donor with ID " + request.getDonorId() + " not found")
@@ -242,17 +246,23 @@ public class BaseService {
      final Slot slot = slotsRepository.findById(request.getSlotId()).orElseThrow(
              ()-> new EntityNotFoundException("Slot with ID " + request.getSlotId() + " not found")
      );
-
      Appointment appointment = getAppointment(request, slot, donor);
      appointmentRepository.save(appointment);
      slot.addBooking();
      slotsRepository.save(slot);
 
-     final int total = appointmentRepository.countByDonor(donor);
-     final int attended = appointmentRepository.countByDonorAndStatus(donor, AppointmentStatus.COMPLETED);
-     final int expired = appointmentRepository.countByDonorAndStatus(donor, AppointmentStatus.OVERDUE);
-     log.debug("end..........................appointment");
-     return converter.convertToResponse(appointment, total, attended, expired);
+     return "Appointment scheduled successfully";
+    }
+
+    public AppointmentResponse getAppointmentHistory(Integer donorId){
+        final Donor donor = donorRepository.findByDonorId(donorId).orElseThrow(
+                ()-> new EntityNotFoundException("Donor with ID " + donorId + " not found")
+        );
+        final List<Appointment> appointments = appointmentRepository.findByDonorOrderByAppointmentDateDesc(donor);
+        final int total = appointmentRepository.countByDonor(donor);
+        final int attended = appointmentRepository.countByDonorAndStatus(donor, AppointmentStatus.COMPLETED);
+        final int expired = appointmentRepository.countByDonorAndStatus(donor, AppointmentStatus.OVERDUE);
+        return converter.convertToResponse(appointments, total, attended, expired);
     }
 
     private Appointment getAppointment(AppointmentRequest request, Slot slot, Donor donor) {
@@ -337,23 +347,21 @@ public class BaseService {
         String originalFilename = image.getOriginalFilename();
         assert FilenameUtils.getExtension(originalFilename) != null;
         String fileExtension = FilenameUtils.getExtension(originalFilename).toLowerCase();
+
         if (!List.of("jpg", "jpeg", "png").contains(fileExtension)) {
             throw new IllegalArgumentException("Invalid file type");
         }
 
         String imageName = UUID.randomUUID() + "." + fileExtension;
-        Path uploadPath = Paths.get("src/main/resources/static");
+        String UPLOAD_DIR = "uploads";
+        Path uploadPath = Paths.get(UPLOAD_DIR);
+
         if (!Files.exists(uploadPath)) {
             Files.createDirectories(uploadPath);
         }
 
         Path filePath = uploadPath.resolve(imageName);
-        if (!filePath.normalize().startsWith(uploadPath)) {
-            throw new SecurityException("Detected attempt to write outside the upload directory");
-        }
-
         Files.copy(image.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
-
         return imageName;
     }
 

@@ -5,16 +5,15 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.List;
+
 @NoArgsConstructor
 @AllArgsConstructor
 @Setter
 @Getter
 public class AppointmentResponse {
-    private HospitalResponse hospitalResponse;
-    private String date;
-    private String timeRange;
-    private String status;
-    private int totalAppointments;
-    private int attendedAppointments;
-    private int expiredAppointments;
+    private int total;
+    private int attended;
+    private int expired;
+    private List<AppointmentDetails> appointments;
 }
