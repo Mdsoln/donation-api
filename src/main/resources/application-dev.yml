@@ -6,7 +6,7 @@ spring:
     driver-class-name: org.postgresql.Driver
   jpa:
     hibernate:
-      ddl-auto: none
+      ddl-auto: update
     database: postgresql
     database-platform: org.hibernate.dialect.PostgreSQLDialect
   task:
@@ -16,4 +16,4 @@ spring:
         max-size: 10
   sql:
     init:
-      mode: always
+      mode: never
