@@ -236,7 +236,7 @@ public class BaseService {
         return availableSlots;
     }
 
-    public AppointmentResponse makeAppointment(AppointmentRequest request){
+    public String makeAppointment(AppointmentRequest request){
      log.debug("create...................................appointment");
      final Donor donor = donorRepository.findByDonorId(request.getDonorId()).orElseThrow(
              ()-> new EntityNotFoundException("Donor with ID " + request.getDonorId() + " not found")
@@ -246,18 +246,23 @@ public class BaseService {
      final Slot slot = slotsRepository.findById(request.getSlotId()).orElseThrow(
              ()-> new EntityNotFoundException("Slot with ID " + request.getSlotId() + " not found")
      );
-
      Appointment appointment = getAppointment(request, slot, donor);
      appointmentRepository.save(appointment);
      slot.addBooking();
      slotsRepository.save(slot);
 
-     final int total = appointmentRepository.countByDonor(donor);
-     final int attended = appointmentRepository.countByDonorAndStatus(donor, AppointmentStatus.COMPLETED);
-     final int expired = appointmentRepository.countByDonorAndStatus(donor, AppointmentStatus.OVERDUE);
-     final List<Appointment> allAppointments = appointmentRepository.findByDonorOrderByAppointmentDateDesc(donor);
-     log.debug("end..........................appointment");
-     return converter.convertToResponse(allAppointments, total, attended, expired);
+     return "Appointment scheduled successfully";
+    }
+
+    public AppointmentResponse getAppointmentHistory(Integer donorId){
+        final Donor donor = donorRepository.findByDonorId(donorId).orElseThrow(
+                ()-> new EntityNotFoundException("Donor with ID " + donorId + " not found")
+        );
+        final List<Appointment> appointments = appointmentRepository.findByDonorOrderByAppointmentDateDesc(donor);
+        final int total = appointmentRepository.countByDonor(donor);
+        final int attended = appointmentRepository.countByDonorAndStatus(donor, AppointmentStatus.COMPLETED);
+        final int expired = appointmentRepository.countByDonorAndStatus(donor, AppointmentStatus.OVERDUE);
+        return converter.convertToResponse(appointments, total, attended, expired);
     }
 
     private Appointment getAppointment(AppointmentRequest request, Slot slot, Donor donor) {
