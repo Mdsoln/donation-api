@@ -18,15 +18,22 @@ import java.time.LocalDateTime;
 public class Donation {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer donationId;
+    private Long donationId;
 
-    @OneToOne
-    @JoinColumn(name = "appointment_id", nullable = false)
-    private Appointment appointment;
+    @ManyToOne
+    @JoinColumn(name = "donor_id")
+    private Donor donor;
 
-    private int volumeMl;
+    private double volumeMl;
+    private String bloodType;
+    private String notes;
+
     private LocalDateTime donationDate;
     private LocalDateTime nextEligibleDate;
+
+    @OneToOne
+    @JoinColumn(name = "appointment_id", nullable = true)
+    private Appointment appointment;
 
     public void calculateNextEligibility() {
         this.nextEligibleDate = this.donationDate.plusMonths(3); // 3-month gap

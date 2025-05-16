@@ -1,7 +1,7 @@
 package com.donorapi.controller;
 
 
-import com.donorapi.jpa.HospitalRepository;
+import com.donorapi.models.DonationRequest;
 import com.donorapi.models.HospitalAppointment;
 import com.donorapi.models.HospitalDonors;
 import com.donorapi.models.HospitalRegistrationRequest;
@@ -24,7 +24,6 @@ public class HospitalController {
 
     private final BaseService baseService;
     private final HospitalServiceImpl hospitalService;
-    private final HospitalRepository hospitalRepository;
 
 
     @PostMapping("/register-hospital")
@@ -68,6 +67,13 @@ public class HospitalController {
         }
         final List<HospitalAppointment> appointments = hospitalService.findAppointmentsByHospital(hospitalId);
         return ResponseEntity.ok(appointments);
+    }
+
+    @PostMapping("/donations")
+    public ResponseEntity<String> recordDonation(@RequestBody @Validated DonationRequest request) {
+        log.info("Recording donation: {}", request);
+        String result = hospitalService.recordDonation(request);
+        return ResponseEntity.ok(result);
     }
 
 }
