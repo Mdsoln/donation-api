@@ -12,6 +12,7 @@ import lombok.Setter;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import com.fasterxml.jackson.annotation.JsonFormat;
 
 
 @Entity
@@ -33,9 +34,11 @@ public class Slot {
     private List<Appointment> appointments;
 
     @Future
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm")
     private LocalDateTime startTime;
     private int maxCapacity = 10;  // Max donors (e.g., 5-10)
     private int currentBookings = 0;
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm")
     private LocalDateTime endTime;
     private boolean isBooked;
 

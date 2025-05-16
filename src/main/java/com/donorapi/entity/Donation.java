@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
+import com.fasterxml.jackson.annotation.JsonFormat;
 
 @NoArgsConstructor
 @AllArgsConstructor
@@ -28,7 +29,10 @@ public class Donation {
     private String bloodType;
     private String notes;
 
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm")
     private LocalDateTime donationDate;
+
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm")
     private LocalDateTime nextEligibleDate;
 
     @OneToOne
