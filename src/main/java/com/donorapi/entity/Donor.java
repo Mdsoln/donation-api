@@ -32,6 +32,7 @@ public class Donor {
     private String email;
     private String phone;
     private String bloodType;
+    private String age;
     private double height;
     private double weight;
     private LocalDate birthDate;

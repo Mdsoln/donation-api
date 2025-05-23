@@ -68,6 +68,8 @@ public class BaseService {
         donor.setFullName(donorRequest.getFullName());
         donor.setEmail(donorRequest.getEmail());
         donor.setPhone(donorRequest.getPhone());
+        donor.setAge(donorRequest.getAge());
+        donor.setGender(donorRequest.getGender());
         donorRepository.save(donor);
 
         Map<String, String> response = new HashMap<>();
