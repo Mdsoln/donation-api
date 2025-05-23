@@ -1,0 +1,321 @@
+package com.donorapi.report.util;
+
+import com.donorapi.report.model.DonorReportDTO;
+import com.donorapi.report.model.HospitalReportDTO;
+import lombok.extern.log4j.Log4j2;
+import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.springframework.stereotype.Component;
+
+import java.io.ByteArrayOutputStream;
+import java.time.format.DateTimeFormatter;
+import java.util.List;
+
+/**
+ * Utility class for exporting reports to Excel format
+ */
+@Component
+@Log4j2
+public class ExcelExporter {
+
+    private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("dd MMM yyyy");
+
+    /**
+     * Export a hospital report to Excel
+     * @param report The hospital report data
+     * @return The Excel file as a byte array
+     */
+    public byte[] exportHospitalReportToExcel(HospitalReportDTO report) {
+        try (Workbook workbook = new XSSFWorkbook()) {
+            // Create styles
+            CellStyle headerStyle = createHeaderStyle(workbook);
+            CellStyle dataStyle = createDataStyle(workbook);
+            
+            // Create Summary sheet
+            Sheet summarySheet = workbook.createSheet("Summary");
+            
+            // Add title
+            Row titleRow = summarySheet.createRow(0);
+            Cell titleCell = titleRow.createCell(0);
+            titleCell.setCellValue("Hospital Donation Report");
+            
+            // Add hospital info
+            Row hospitalRow = summarySheet.createRow(1);
+            Cell hospitalCell = hospitalRow.createCell(0);
+            hospitalCell.setCellValue("Hospital: " + report.getHospitalName());
+            
+            // Add report period
+            Row periodRow = summarySheet.createRow(2);
+            Cell periodCell = periodRow.createCell(0);
+            periodCell.setCellValue("Period: " + report.getReportPeriod());
+            
+            // Add summary data
+            Row summaryHeaderRow = summarySheet.createRow(4);
+            createHeaderRow(summaryHeaderRow, headerStyle, "Metric", "Value");
+            
+            int rowNum = 5;
+            createDataRow(summarySheet.createRow(rowNum++), dataStyle, "Total Donations", String.valueOf(report.getTotalDonations()));
+            createDataRow(summarySheet.createRow(rowNum++), dataStyle, "Total Volume (ml)", String.format("%.2f", report.getTotalVolumeMl()));
+            createDataRow(summarySheet.createRow(rowNum++), dataStyle, "Unique Donors", String.valueOf(report.getUniqueDonors()));
+            createDataRow(summarySheet.createRow(rowNum++), dataStyle, "Date Range", 
+                    report.getStartDate().format(DATE_FORMATTER) + " - " + 
+                    report.getEndDate().format(DATE_FORMATTER));
+            
+            // Auto-size columns
+            summarySheet.autoSizeColumn(0);
+            summarySheet.autoSizeColumn(1);
+            
+            // Create Quarterly Data sheet if available
+            if (report.getQuarterlyData() != null && !report.getQuarterlyData().isEmpty()) {
+                Sheet quarterlySheet = workbook.createSheet("Quarterly Data");
+                
+                // Add header
+                Row headerRow = quarterlySheet.createRow(0);
+                createHeaderRow(headerRow, headerStyle, "Quarter", "Donations", "Volume (ml)", "Donors");
+                
+                // Add data rows
+                rowNum = 1;
+                for (HospitalReportDTO.QuarterlyData data : report.getQuarterlyData()) {
+                    Row row = quarterlySheet.createRow(rowNum++);
+                    int colNum = 0;
+                    row.createCell(colNum++).setCellValue(data.getQuarter());
+                    row.createCell(colNum++).setCellValue(data.getDonations());
+                    row.createCell(colNum++).setCellValue(data.getVolumeMl());
+                    row.createCell(colNum++).setCellValue(data.getDonors());
+                    
+                    // Apply style
+                    for (int i = 0; i < colNum; i++) {
+                        row.getCell(i).setCellStyle(dataStyle);
+                    }
+                }
+                
+                // Auto-size columns
+                for (int i = 0; i < 4; i++) {
+                    quarterlySheet.autoSizeColumn(i);
+                }
+            }
+            
+            // Create Blood Type Distribution sheet if available
+            if (report.getBloodTypeDistribution() != null && !report.getBloodTypeDistribution().isEmpty()) {
+                Sheet bloodTypeSheet = workbook.createSheet("Blood Type Distribution");
+                
+                // Add header
+                Row headerRow = bloodTypeSheet.createRow(0);
+                createHeaderRow(headerRow, headerStyle, "Blood Type", "Count", "Percentage");
+                
+                // Add data rows
+                rowNum = 1;
+                for (HospitalReportDTO.BloodTypeData data : report.getBloodTypeDistribution()) {
+                    Row row = bloodTypeSheet.createRow(rowNum++);
+                    int colNum = 0;
+                    row.createCell(colNum++).setCellValue(data.getBloodType());
+                    row.createCell(colNum++).setCellValue(data.getCount());
+                    row.createCell(colNum++).setCellValue(String.format("%.2f%%", data.getPercentage()));
+                    
+                    // Apply style
+                    for (int i = 0; i < colNum; i++) {
+                        row.getCell(i).setCellStyle(dataStyle);
+                    }
+                }
+                
+                // Auto-size columns
+                for (int i = 0; i < 3; i++) {
+                    bloodTypeSheet.autoSizeColumn(i);
+                }
+            }
+            
+            // Write to byte array
+            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+            workbook.write(outputStream);
+            return outputStream.toByteArray();
+            
+        } catch (Exception e) {
+            log.error("Error exporting hospital report to Excel", e);
+            throw new RuntimeException("Error exporting hospital report to Excel", e);
+        }
+    }
+    
+    /**
+     * Export a donor report to Excel
+     * @param report The donor report data
+     * @return The Excel file as a byte array
+     */
+    public byte[] exportDonorReportToExcel(DonorReportDTO report) {
+        try (Workbook workbook = new XSSFWorkbook()) {
+            // Create styles
+            CellStyle headerStyle = createHeaderStyle(workbook);
+            CellStyle dataStyle = createDataStyle(workbook);
+            
+            // Create Summary sheet
+            Sheet summarySheet = workbook.createSheet("Summary");
+            
+            // Add title
+            Row titleRow = summarySheet.createRow(0);
+            Cell titleCell = titleRow.createCell(0);
+            titleCell.setCellValue("Donor Report");
+            
+            // Add donor info
+            Row donorRow = summarySheet.createRow(1);
+            Cell donorCell = donorRow.createCell(0);
+            donorCell.setCellValue("Donor: " + report.getDonorName());
+            
+            // Add blood type if available
+            if (report.getBloodType() != null) {
+                Row bloodTypeRow = summarySheet.createRow(2);
+                Cell bloodTypeCell = bloodTypeRow.createCell(0);
+                bloodTypeCell.setCellValue("Blood Type: " + report.getBloodType());
+            }
+            
+            // Add report period
+            Row periodRow = summarySheet.createRow(3);
+            Cell periodCell = periodRow.createCell(0);
+            periodCell.setCellValue("Period: " + report.getReportPeriod());
+            
+            // Add donation summary
+            Row donationHeaderRow = summarySheet.createRow(5);
+            createHeaderRow(donationHeaderRow, headerStyle, "Donation Metric", "Value");
+            
+            int rowNum = 6;
+            createDataRow(summarySheet.createRow(rowNum++), dataStyle, "Total Donations", String.valueOf(report.getTotalDonations()));
+            createDataRow(summarySheet.createRow(rowNum++), dataStyle, "Total Volume (ml)", String.format("%.2f", report.getTotalVolumeMl()));
+            
+            if (report.getFirstDonationDate() != null) {
+                createDataRow(summarySheet.createRow(rowNum++), dataStyle, "First Donation", report.getFirstDonationDate().format(DATE_FORMATTER));
+            }
+            
+            if (report.getLastDonationDate() != null) {
+                createDataRow(summarySheet.createRow(rowNum++), dataStyle, "Last Donation", report.getLastDonationDate().format(DATE_FORMATTER));
+            }
+            
+            // Add appointment summary
+            Row appointmentHeaderRow = summarySheet.createRow(rowNum + 1);
+            createHeaderRow(appointmentHeaderRow, headerStyle, "Appointment Metric", "Value");
+            
+            rowNum += 2;
+            createDataRow(summarySheet.createRow(rowNum++), dataStyle, "Total Appointments", String.valueOf(report.getTotalAppointments()));
+            createDataRow(summarySheet.createRow(rowNum++), dataStyle, "Completed", String.valueOf(report.getCompletedAppointments()));
+            createDataRow(summarySheet.createRow(rowNum++), dataStyle, "Scheduled", String.valueOf(report.getScheduledAppointments()));
+            createDataRow(summarySheet.createRow(rowNum++), dataStyle, "Expired", String.valueOf(report.getExpiredAppointments()));
+            createDataRow(summarySheet.createRow(rowNum++), dataStyle, "Cancelled", String.valueOf(report.getCancelledAppointments()));
+            
+            // Auto-size columns
+            summarySheet.autoSizeColumn(0);
+            summarySheet.autoSizeColumn(1);
+            
+            // Create Donation History sheet if available
+            if (report.getPeriodData() != null && !report.getPeriodData().isEmpty()) {
+                Sheet historySheet = workbook.createSheet("Donation History");
+                
+                // Add header
+                Row headerRow = historySheet.createRow(0);
+                createHeaderRow(headerRow, headerStyle, "Period", "Donations", "Volume (ml)");
+                
+                // Add data rows
+                rowNum = 1;
+                for (DonorReportDTO.PeriodData data : report.getPeriodData()) {
+                    Row row = historySheet.createRow(rowNum++);
+                    int colNum = 0;
+                    row.createCell(colNum++).setCellValue(data.getPeriod());
+                    row.createCell(colNum++).setCellValue(data.getDonations());
+                    row.createCell(colNum++).setCellValue(data.getVolumeMl());
+                    
+                    // Apply style
+                    for (int i = 0; i < colNum; i++) {
+                        row.getCell(i).setCellStyle(dataStyle);
+                    }
+                }
+                
+                // Auto-size columns
+                for (int i = 0; i < 3; i++) {
+                    historySheet.autoSizeColumn(i);
+                }
+            }
+            
+            // Create Hospital Breakdown sheet if available
+            if (report.getHospitalData() != null && !report.getHospitalData().isEmpty()) {
+                Sheet hospitalSheet = workbook.createSheet("Hospital Breakdown");
+                
+                // Add header
+                Row headerRow = hospitalSheet.createRow(0);
+                createHeaderRow(headerRow, headerStyle, "Hospital", "Donations", "Volume (ml)", "Percentage");
+                
+                // Add data rows
+                rowNum = 1;
+                for (DonorReportDTO.HospitalData data : report.getHospitalData()) {
+                    Row row = hospitalSheet.createRow(rowNum++);
+                    int colNum = 0;
+                    row.createCell(colNum++).setCellValue(data.getHospitalName());
+                    row.createCell(colNum++).setCellValue(data.getDonations());
+                    row.createCell(colNum++).setCellValue(data.getVolumeMl());
+                    row.createCell(colNum++).setCellValue(String.format("%.2f%%", data.getPercentage()));
+                    
+                    // Apply style
+                    for (int i = 0; i < colNum; i++) {
+                        row.getCell(i).setCellStyle(dataStyle);
+                    }
+                }
+                
+                // Auto-size columns
+                for (int i = 0; i < 4; i++) {
+                    hospitalSheet.autoSizeColumn(i);
+                }
+            }
+            
+            // Write to byte array
+            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+            workbook.write(outputStream);
+            return outputStream.toByteArray();
+            
+        } catch (Exception e) {
+            log.error("Error exporting donor report to Excel", e);
+            throw new RuntimeException("Error exporting donor report to Excel", e);
+        }
+    }
+    
+    // Helper methods
+    
+    private CellStyle createHeaderStyle(Workbook workbook) {
+        CellStyle style = workbook.createCellStyle();
+        style.setFillForegroundColor(IndexedColors.GREY_25_PERCENT.getIndex());
+        style.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+        style.setBorderBottom(BorderStyle.THIN);
+        style.setBorderTop(BorderStyle.THIN);
+        style.setBorderLeft(BorderStyle.THIN);
+        style.setBorderRight(BorderStyle.THIN);
+        
+        Font font = workbook.createFont();
+        font.setBold(true);
+        style.setFont(font);
+        
+        return style;
+    }
+    
+    private CellStyle createDataStyle(Workbook workbook) {
+        CellStyle style = workbook.createCellStyle();
+        style.setBorderBottom(BorderStyle.THIN);
+        style.setBorderTop(BorderStyle.THIN);
+        style.setBorderLeft(BorderStyle.THIN);
+        style.setBorderRight(BorderStyle.THIN);
+        
+        return style;
+    }
+    
+    private void createHeaderRow(Row row, CellStyle style, String... headers) {
+        int colNum = 0;
+        for (String header : headers) {
+            Cell cell = row.createCell(colNum++);
+            cell.setCellValue(header);
+            cell.setCellStyle(style);
+        }
+    }
+    
+    private void createDataRow(Row row, CellStyle style, String label, String value) {
+        Cell labelCell = row.createCell(0);
+        labelCell.setCellValue(label);
+        labelCell.setCellStyle(style);
+        
+        Cell valueCell = row.createCell(1);
+        valueCell.setCellValue(value);
+        valueCell.setCellStyle(style);
+    }
+}
