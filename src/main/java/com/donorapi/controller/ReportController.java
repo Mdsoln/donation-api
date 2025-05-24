@@ -19,7 +19,7 @@ import java.util.List;
  * Controller for report generation and export
  */
 @RestController
-@RequestMapping("/api/reports")
+@RequestMapping(path = "/api/v1/reports")
 @RequiredArgsConstructor
 @Log4j2
 @Tag(name = "Reports", description = "Endpoints for generating and exporting reports")
@@ -79,7 +79,7 @@ public class ReportController {
      * @return List of hospital reports for comparison
      */
     @PostMapping("/hospital/comparison")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('HOSPITAL')")
     @Operation(summary = "Generate a hospital comparison report", description = "Generate a comparison report for all hospitals")
     public ResponseEntity<List<HospitalReportDTO>> generateHospitalComparisonReport(
             @RequestBody ReportRequest request) {
