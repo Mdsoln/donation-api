@@ -1,7 +1,7 @@
 package com.donorapi.jwt.config;
 
-import com.donorapi.entity.Users;
-import com.donorapi.jpa.UserRepository;
+import com.donorapi.donor.entity.Users;
+import com.donorapi.donor.jpa.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

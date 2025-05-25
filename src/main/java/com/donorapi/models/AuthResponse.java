@@ -1,5 +1,6 @@
 package com.donorapi.models;
 
+import com.donorapi.hospital.models.AppointmentCard;
 import lombok.*;
 
 @NoArgsConstructor

@@ -1,7 +1,13 @@
 package com.donorapi.controller;
 
-import com.donorapi.entity.Hospital;
-import com.donorapi.jpa.HospitalRepository;
+import com.donorapi.donor.models.DonorRegistrationRequest;
+import com.donorapi.donor.models.ProfileRequest;
+import com.donorapi.donor.models.ProfileResponse;
+import com.donorapi.hospital.entity.Hospital;
+import com.donorapi.hospital.jpa.HospitalRepository;
+import com.donorapi.hospital.models.AppointmentRequest;
+import com.donorapi.hospital.models.AppointmentResponse;
+import com.donorapi.hospital.models.SlotDto;
 import com.donorapi.models.*;
 import com.donorapi.service.BaseService;
 import com.donorapi.service.LocationService;

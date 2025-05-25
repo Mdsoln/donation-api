@@ -1,0 +1,69 @@
+package com.donorapi.hospital.entity;
+
+import com.donorapi.donor.entity.Donor;
+import com.donorapi.utilities.AppointmentStatus;
+import com.donorapi.hospital.service.AppointmentOverdueEvent;
+import com.donorapi.config.DomainEventPublisher;
+import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+
+
+@Entity
+@Table(name = "appointment")
+@Getter @Setter @NoArgsConstructor @AllArgsConstructor
+public class Appointment {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @ManyToOne
+    @JoinColumn(name = "donor_id", nullable = false)
+    private Donor donor;
+
+    @ManyToOne
+    @JoinColumn(name = "slot_id", nullable = false)
+    private Slot slot;
+
+    @Enumerated(EnumType.STRING)
+    private AppointmentStatus status;
+
+    private String description;
+    private boolean bloodDonated;
+    private LocalDateTime statusChangedAt;
+    private boolean overdue = false;
+    private boolean notificationSent = false;
+    @Column(name = "date", nullable = false)
+    private LocalDate appointmentDate;
+
+
+    @PreUpdate
+    public void checkForOverdue() {
+        if (this.status == AppointmentStatus.SCHEDULED &&
+                LocalDateTime.now().isAfter(this.slot.getEndTime())) {
+            this.markAsOverdue();
+            DomainEventPublisher.publish(new AppointmentOverdueEvent(this));
+        }
+    }
+
+    public void markAsOverdue() {
+        this.status = AppointmentStatus.OVERDUE;
+        this.overdue = true;
+        this.statusChangedAt = LocalDateTime.now();
+    }
+
+
+    public boolean hasPendingStatus(){
+        return this.status.equals(AppointmentStatus.PENDING);
+    }
+
+    public boolean hasScheduledStatus(){
+        return this.status.equals(AppointmentStatus.SCHEDULED);
+    }
+
+}

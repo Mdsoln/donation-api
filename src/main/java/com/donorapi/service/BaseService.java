@@ -1,15 +1,31 @@
 package com.donorapi.service;
 
-import com.donorapi.entity.*;
+import com.donorapi.donor.entity.Donor;
+import com.donorapi.donor.entity.Users;
+import com.donorapi.donor.jpa.DonationRepository;
+import com.donorapi.donor.jpa.DonorRepository;
+import com.donorapi.donor.jpa.UserRepository;
+import com.donorapi.donor.models.DonorRegistrationRequest;
+import com.donorapi.donor.models.ProfileRequest;
+import com.donorapi.donor.models.ProfileResponse;
 import com.donorapi.exception.DonationEligibilityException;
 import com.donorapi.exception.OverBookingException;
-import com.donorapi.jpa.*;
+import com.donorapi.hospital.entity.Appointment;
+import com.donorapi.hospital.entity.Hospital;
+import com.donorapi.hospital.entity.Slot;
+import com.donorapi.hospital.jpa.AppointmentRepository;
+import com.donorapi.hospital.jpa.HospitalRepository;
+import com.donorapi.hospital.jpa.SlotsRepository;
+import com.donorapi.hospital.models.*;
+import com.donorapi.hospital.service.AppointmentJsonConverterImpl;
 import com.donorapi.exception.EmailExistsException;
 import com.donorapi.exception.HospitalFoundException;
 import com.donorapi.jwt.service.JwtService;
 import com.donorapi.models.*;
+import com.donorapi.utilities.AppointmentStatus;
 import com.donorapi.utilities.DateFormatter;
 
+import com.donorapi.utilities.UserRoles;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -80,8 +96,9 @@ public class BaseService {
         hospitalRepository.findByHospitalName(hospitalRequest.getHospitalName()).ifPresent(hospital -> {
             throw new HospitalFoundException("Hospital already exists");
         });
+        String username = generateCustomAdminUsername(hospitalRequest.getHospitalName());
         Users user = new Users();
-        user.setUsername(hospitalRequest.getHospitalName());
+        user.setUsername(username);
         user.setRoles(UserRoles.HOSPITAL);
         user.setPassword(passwordEncoder.encode(hospitalRequest.getPassword()));
         userRepository.save(user);
@@ -91,9 +108,28 @@ public class BaseService {
         hospital.setHospitalName(hospitalRequest.getHospitalName());
         hospital.setHospitalAddress(hospitalRequest.getHospitalAddress());
         hospital.setHospitalCity(hospitalRequest.getHospitalCity());
+        hospital.setLatitude(hospitalRequest.getLatitude());
+        hospital.setLongitude(hospitalRequest.getLongitude());
         hospitalRepository.save(hospital);
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
+
+    private String generateCustomAdminUsername(String hospitalName) {
+        String cleanedName = hospitalName.replaceAll("(?i)hospital", "")
+                .trim()
+                .toLowerCase()
+                .replaceAll("\\s+", "");
+
+        String username = cleanedName + ".admin";
+        int count = 1;
+
+        while (userRepository.findByUsername(username).isPresent()) {
+            username = cleanedName + count + ".admin";
+            count++;
+        }
+        return username;
+    }
+
 
     public ResponseEntity<AuthResponse> authenticateUser(AuthRequest request){
         return userRepository.findByUsername(request.getUsername())
