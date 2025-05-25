@@ -4,8 +4,15 @@ import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 
+import com.donorapi.entity.Donation;
 import com.donorapi.exception.InvalidAppointmentStatusException;
+<<<<<<< HEAD:src/main/java/com/donorapi/hospital/service/HospitalServiceImpl.java
 import com.donorapi.hospital.models.HospitalAppointment;
+=======
+import com.donorapi.jpa.DonorRepository;
+import com.donorapi.donor.models.DonationRequest;
+import com.donorapi.models.HospitalAppointment;
+>>>>>>> 76b6ab63e362f226b6b57ec530b8b0dc09cfe0b0:src/main/java/com/donorapi/service/HospitalServiceImpl.java
 import com.donorapi.utilities.DateFormatter;
 import org.springframework.stereotype.Service;
 
@@ -27,6 +34,7 @@ import lombok.extern.log4j.Log4j2;
 public class HospitalServiceImpl {
     private final AppointmentRepository appointmentRepository;
     private final DonationRepository donationRepository;
+    private final DonorRepository donorRepository;
 
 
     @Transactional
@@ -89,4 +97,45 @@ public class HospitalServiceImpl {
         }).toList();
     }
 
+    @Transactional
+    public String recordDonation(DonationRequest request) {
+        Donor donor = donorRepository.findById(request.donorId())
+                .orElseThrow(() -> new EntityNotFoundException("Donor not found with ID: " + request.donorId()));
+
+        Donation donation = new Donation();
+        donation.setDonor(donor);
+        donation.setVolumeMl(request.volumeMl());
+        donation.setBloodType(request.bloodType());
+        donation.setNotes(request.notes());
+        donation.setDonationDate(LocalDateTime.now());
+
+        // Calculate the next eligibility date (3 months from donation)
+        donation.calculateNextEligibility();
+
+        // Handle appointment if provided
+        if (request.appointmentId() != null) {
+            // Scenario 1: Donation with appointment
+            Appointment appointment = appointmentRepository.findById(request.appointmentId())
+                    .orElseThrow(() -> new EntityNotFoundException("Appointment not found with ID: " + request.appointmentId()));
+
+            // Update appointment status
+            appointment.setBloodDonated(true);
+            appointment.setStatus(AppointmentStatus.COMPLETED);
+            appointment.setStatusChangedAt(LocalDateTime.now());
+            appointmentRepository.save(appointment);
+
+            // Link appointment to donation
+            donation.setAppointment(appointment);
+
+            log.info("Recorded donation for appointment ID: {}", request.appointmentId());
+        } else {
+            // Scenario 2: Direct donation without appointment
+            log.info("Recorded direct donation for donor ID: {}", request.donorId());
+        }
+
+        // Save the donation
+        donationRepository.save(donation);
+
+        return "Donation recorded successfully";
+    }
 }

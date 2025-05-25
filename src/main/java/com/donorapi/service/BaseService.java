@@ -74,7 +74,7 @@ public class BaseService {
             throw new EmailExistsException("EMAIL_ALREADY_EXISTS", "A donor with this email already exists.");
         });
         Users user = new Users();
-        user.setUsername(donorRequest.getEmail());
+        user.setUsername(donorRequest.getUsername());
         user.setRoles(UserRoles.DONOR);
         user.setPassword(passwordEncoder.encode(donorRequest.getPassword()));
         userRepository.save(user);
@@ -84,6 +84,8 @@ public class BaseService {
         donor.setFullName(donorRequest.getFullName());
         donor.setEmail(donorRequest.getEmail());
         donor.setPhone(donorRequest.getPhone());
+        donor.setAge(donorRequest.getAge());
+        donor.setGender(donorRequest.getGender());
         donorRepository.save(donor);
 
         Map<String, String> response = new HashMap<>();
@@ -161,7 +163,7 @@ public class BaseService {
                     final double height = donor.getHeight();
                     final double weight = donor.getWeight();
                     final String gender = donor.getGender();
-                    
+
                     final int donations = donorRepository.countByAppointmentDonor(donor);
                     final Optional<Appointment> upcomingAppointmentOpt = appointmentRepository.findByDonorAndStatusOrderBySlotEndTimeDesc(donor, AppointmentStatus.SCHEDULED);
                     log.debug("upcoming appointment {}", upcomingAppointmentOpt);
@@ -303,10 +305,10 @@ public class BaseService {
 
     private Appointment getAppointment(AppointmentRequest request, Slot slot, Donor donor) {
         if (slot.getHospital().getHospitalId() != request.getHospitalId()) {
-            throw new IllegalStateException("Slot with  ID " + request.getSlotId() + "does not belong to hospital ID " + request.getHospitalId());
+            throw new IllegalStateException("Slot with ID " + request.getSlotId() + " does not belong to hospital ID " + request.getHospitalId());
         }
         if (slot.isFull()) {
-            throw new OverBookingException("Slot with  ID " + request.getSlotId() + "is already full");
+            throw new OverBookingException("Slot with ID " + request.getSlotId() + " is already full");
         }
 
         final LocalDate appointmentDate = slot.getStartTime().toLocalDate();
@@ -410,10 +412,10 @@ public class BaseService {
     private AppointmentCard mapToAppointmentCard(Appointment appointment) {
         LocalDate appointmentDate = appointment.getAppointmentDate();
         int daysToGo = Period.between(LocalDate.now(), appointmentDate).getDays();
-    
+
         Slot slot = appointment.getSlot();
         Hospital hospital = slot.getHospital();
-    
+
         return AppointmentCard.builder()
                 .hospital(mapToHospitalResponse(hospital))
                 .date(DateFormatter.formatDate(slot.getStartTime()))

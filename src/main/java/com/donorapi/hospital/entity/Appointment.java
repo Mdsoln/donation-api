@@ -12,6 +12,7 @@ import lombok.Setter;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import com.fasterxml.jackson.annotation.JsonFormat;
 
 
 @Entity
@@ -35,6 +36,7 @@ public class Appointment {
 
     private String description;
     private boolean bloodDonated;
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm")
     private LocalDateTime statusChangedAt;
     private boolean overdue = false;
     private boolean notificationSent = false;

@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
+import com.fasterxml.jackson.annotation.JsonFormat;
 
 @NoArgsConstructor
 @AllArgsConstructor
@@ -19,15 +20,25 @@ import java.time.LocalDateTime;
 public class Donation {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer donationId;
+    private Long donationId;
+
+    @ManyToOne
+    @JoinColumn(name = "donor_id")
+    private Donor donor;
+
+    private double volumeMl;
+    private String bloodType;
+    private String notes;
+
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm")
+    private LocalDateTime donationDate;
+
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm")
+    private LocalDateTime nextEligibleDate;
 
     @OneToOne
-    @JoinColumn(name = "appointment_id", nullable = false)
+    @JoinColumn(name = "appointment_id", nullable = true)
     private Appointment appointment;
-
-    private int volumeMl;
-    private LocalDateTime donationDate;
-    private LocalDateTime nextEligibleDate;
 
     public void calculateNextEligibility() {
         this.nextEligibleDate = this.donationDate.plusMonths(3); // 3-month gap

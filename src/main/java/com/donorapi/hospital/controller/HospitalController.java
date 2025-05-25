@@ -1,5 +1,6 @@
 package com.donorapi.hospital.controller;
 
+import com.donorapi.donor.models.DonationRequest;
 import com.donorapi.models.AuthRequest;
 import com.donorapi.hospital.models.HospitalAppointment;
 import com.donorapi.hospital.models.HospitalDonors;
@@ -35,6 +36,7 @@ public class HospitalController {
         if (request == null){
             throw new IllegalArgumentException("Username and password are required");
         }
+        return null;
     }
 
     @PostMapping("/appointments/{appointmentId}/approval")
@@ -73,6 +75,13 @@ public class HospitalController {
         }
         final List<HospitalAppointment> appointments = hospitalService.findAppointmentsByHospital(hospitalId);
         return ResponseEntity.ok(appointments);
+    }
+
+    @PostMapping("/donations")
+    public ResponseEntity<String> recordDonation(@RequestBody @Validated DonationRequest request) {
+        log.info("Recording donation: {}", request);
+        String result = hospitalService.recordDonation(request);
+        return ResponseEntity.ok(result);
     }
 
 }
