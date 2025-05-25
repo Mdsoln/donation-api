@@ -4,15 +4,11 @@ import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 
-import com.donorapi.entity.Donation;
-import com.donorapi.exception.InvalidAppointmentStatusException;
-<<<<<<< HEAD:src/main/java/com/donorapi/hospital/service/HospitalServiceImpl.java
-import com.donorapi.hospital.models.HospitalAppointment;
-=======
-import com.donorapi.jpa.DonorRepository;
+import com.donorapi.donor.entity.Donation;
+import com.donorapi.donor.jpa.DonorRepository;
 import com.donorapi.donor.models.DonationRequest;
-import com.donorapi.models.HospitalAppointment;
->>>>>>> 76b6ab63e362f226b6b57ec530b8b0dc09cfe0b0:src/main/java/com/donorapi/service/HospitalServiceImpl.java
+import com.donorapi.exception.InvalidAppointmentStatusException;
+import com.donorapi.hospital.models.HospitalAppointment;
 import com.donorapi.utilities.DateFormatter;
 import org.springframework.stereotype.Service;
 

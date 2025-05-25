@@ -1,13 +1,22 @@
 package com.donorapi.report.service;
 
-import com.donorapi.entity.*;
-import com.donorapi.jpa.*;
-import com.donorapi.models.AppointmentStatus;
+
+import com.donorapi.donor.entity.Donation;
+import com.donorapi.donor.entity.Donor;
+import com.donorapi.donor.jpa.DonationRepository;
+import com.donorapi.donor.jpa.DonorRepository;
+import com.donorapi.hospital.entity.Appointment;
+import com.donorapi.hospital.entity.Hospital;
+import com.donorapi.hospital.entity.Slot;
+import com.donorapi.hospital.jpa.AppointmentRepository;
+import com.donorapi.hospital.jpa.HospitalRepository;
+import com.donorapi.hospital.jpa.SlotsRepository;
 import com.donorapi.report.model.DonorReportDTO;
 import com.donorapi.report.model.HospitalReportDTO;
 import com.donorapi.report.model.ReportRequest;
 import com.donorapi.report.util.ExcelExporter;
 import com.donorapi.report.util.PdfExporter;
+import com.donorapi.utilities.AppointmentStatus;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -19,7 +28,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.Month;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
@@ -62,7 +70,7 @@ public class ReportServiceImpl implements ReportService {
                     LocalDate appointmentDate = a.getAppointmentDate();
                     return !appointmentDate.isBefore(startDate) && !appointmentDate.isAfter(endDate);
                 })
-                .collect(Collectors.toList());
+                .toList();
 
         // Get donations for these appointments
         List<Donation> donations = new ArrayList<>();
@@ -71,7 +79,7 @@ public class ReportServiceImpl implements ReportService {
             // Note: This is inefficient and should be replaced with a proper query
             List<Donation> appointmentDonations = donationRepository.findAll().stream()
                     .filter(d -> d.getAppointment() != null && d.getAppointment().getId().equals(appointment.getId()))
-                    .collect(Collectors.toList());
+                    .toList();
             donations.addAll(appointmentDonations);
         }
 
@@ -158,7 +166,7 @@ public class ReportServiceImpl implements ReportService {
                     LocalDate appointmentDate = a.getAppointmentDate();
                     return !appointmentDate.isBefore(startDate) && !appointmentDate.isAfter(endDate);
                 })
-                .collect(Collectors.toList());
+                .toList();
 
         // Get donations for these appointments
         List<Donation> donations = new ArrayList<>();
@@ -167,7 +175,7 @@ public class ReportServiceImpl implements ReportService {
             // Note: This is inefficient and should be replaced with a proper query
             List<Donation> appointmentDonations = donationRepository.findAll().stream()
                     .filter(d -> d.getAppointment() != null && d.getAppointment().getId().equals(appointment.getId()))
-                    .collect(Collectors.toList());
+                    .toList();
             donations.addAll(appointmentDonations);
         }
 

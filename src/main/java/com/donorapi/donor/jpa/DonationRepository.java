@@ -17,7 +17,7 @@ public interface DonationRepository extends JpaRepository<Donation,Integer> {
     int countDonationsByDonorAndHospital(@Param("donor") Donor donor, @Param("hospitalId") Long hospitalId);
 
     @Query("""
-    SELECT new com.donorapi.models.HospitalDonors(
+    SELECT new com.donorapi.hospital.models.HospitalDonors(
         d.donorId,
         d.fullName,
         d.email,
