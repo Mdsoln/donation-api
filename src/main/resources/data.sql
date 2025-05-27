@@ -1,10 +1,10 @@
 -- Admin users
-INSERT INTO users (username, password, roles, created_at) VALUES
-('admin1', '$2a$10$xyz123', 'HOSPITAL', '2023-01-01 08:00:00'),
-('hospital_admin1', '$2a$10$xyz123', 'HOSPITAL', '2025-01-02 09:00:00'),
-('hospital_admin2', '$2a$10$xyz123', 'HOSPITAL', '2025-01-03 10:00:00'),
-('hospital_admin3', '$2a$10$xyz123', 'HOSPITAL', '2025-01-04 11:00:00'),
-('hospital_admin4', '$2a$10$xyz123', 'HOSPITAL', '2025-01-05 12:00:00');
+-- INSERT INTO users (username, password, roles, created_at) VALUES
+-- ('admin1', '$2a$10$xyz123', 'HOSPITAL', '2023-01-01 08:00:00'),
+-- ('hospital_admin1', '$2a$10$xyz123', 'HOSPITAL', '2025-01-02 09:00:00'),
+-- ('hospital_admin2', '$2a$10$xyz123', 'HOSPITAL', '2025-01-03 10:00:00'),
+-- ('hospital_admin3', '$2a$10$xyz123', 'HOSPITAL', '2025-01-04 11:00:00'),
+-- ('hospital_admin4', '$2a$10$xyz123', 'HOSPITAL', '2025-01-05 12:00:00');
 
 -- Donor users
 INSERT INTO users (username, password, roles, created_at) VALUES
@@ -41,13 +41,13 @@ INSERT INTO donors (user_id, full_name, email, phone, blood_type, height, weight
 (20, 'Joseph Ben', 'joseph.ben@example.com', '+255724567890', 'A-', 176, 74, '1990-07-03', 'Male', 'joseph.jpg', 'Tegeta, Dar es Salaam', '2023-02-13 20:00:00');
 
 --Hospital Details
-INSERT INTO hospitals (hospital_id, hospital_name, hospital_address, hospital_city) VALUES
-(1, 'Muhimbili National Hospital', 'United Nations Road, Upanga', 'Dar es Salaam'),
-(2, 'Aga Khan Hospital', 'Ocean Road, Kivukoni', 'Dar es Salaam'),
-(3, 'Tumaini Hospital', 'Ali Hassan Mwinyi Road, Kariakoo', 'Dar es Salaam'),
-(4, 'Mwananyamala Hospital', 'Mwananyamala Road, Kinondoni', 'Dar es Salaam'),
-(5, 'Temeke Hospital', 'Temeke St.', 'Dar es Salaam'),
-(6,'Amana Regional Hospital', 'Ilala', 'Dar es Salaam');
+-- INSERT INTO hospitals (hospital_id, hospital_name, hospital_address, hospital_city) VALUES
+-- (1, 'Muhimbili National Hospital', 'United Nations Road, Upanga', 'Dar es Salaam'),
+-- (2, 'Aga Khan Hospital', 'Ocean Road, Kivukoni', 'Dar es Salaam'),
+-- (3, 'Tumaini Hospital', 'Ali Hassan Mwinyi Road, Kariakoo', 'Dar es Salaam'),
+-- (4, 'Mwananyamala Hospital', 'Mwananyamala Road, Kinondoni', 'Dar es Salaam'),
+-- (5, 'Temeke Hospital', 'Temeke St.', 'Dar es Salaam'),
+-- (6,'Amana Regional Hospital', 'Ilala', 'Dar es Salaam');
 
 --Slots details
 
@@ -62,45 +62,45 @@ INSERT INTO slots (hospital_id, max_capacity, current_bookings, start_time, end_
 
 -- Aga Khan Hospital (ID: 2)
 INSERT INTO slots (hospital_id, max_capacity, current_bookings, start_time, end_time, is_booked) VALUES
-(2, 10, 4, '2025-04-03 10:00:00', '2025-04-03 11:30:00', FALSE),
-(2, 10, 1, '2025-04-18 09:00:00', '2025-04-18 10:30:00', FALSE),
-(2, 10, 2, '2025-05-08 13:00:00', '2025-05-08 14:30:00', FALSE),
-(2, 10, 5, '2025-05-20 11:00:00', '2025-05-20 12:30:00', FALSE),
+(2, 10, 4, '2025-06-03 10:00:00', '2025-06-03 11:30:00', FALSE),
+(2, 10, 1, '2025-06-18 09:00:00', '2025-06-18 10:30:00', FALSE),
+(2, 10, 2, '2025-06-08 13:00:00', '2025-06-08 14:30:00', FALSE),
+(2, 10, 5, '2025-06-20 11:00:00', '2025-06-20 12:30:00', FALSE),
 (2, 10, 0, '2025-06-12 15:00:00', '2025-06-12 16:30:00', FALSE),
 (2, 10, 3, '2025-06-22 10:00:00', '2025-06-22 11:30:00', FALSE);
 
 -- Tumaini Hospital (ID: 3)
 INSERT INTO slots (hospital_id, max_capacity, current_bookings, start_time, end_time, is_booked) VALUES
-(3, 10, 3, '2025-04-07 13:00:00', '2025-04-07 14:30:00', FALSE),
-(3, 10, 6, '2025-04-22 15:00:00', '2025-04-22 16:30:00', FALSE),
-(3, 10, 2, '2025-05-10 10:00:00', '2025-05-10 11:30:00', FALSE),
-(3, 10, 0, '2025-05-28 09:00:00', '2025-05-28 10:30:00', FALSE),
+(3, 10, 3, '2025-06-07 13:00:00', '2025-06-07 14:30:00', FALSE),
+(3, 10, 6, '2025-06-22 15:00:00', '2025-06-22 16:30:00', FALSE),
+(3, 10, 2, '2025-06-10 10:00:00', '2025-06-10 11:30:00', FALSE),
+(3, 10, 0, '2025-06-28 09:00:00', '2025-06-28 10:30:00', FALSE),
 (3, 10, 1, '2025-06-15 14:00:00', '2025-06-15 15:30:00', FALSE),
 (3, 10, 4, '2025-06-27 16:00:00', '2025-06-27 17:30:00', FALSE);
 
 -- Mwananyamala Hospital (ID: 4)
 INSERT INTO slots (hospital_id, max_capacity, current_bookings, start_time, end_time, is_booked) VALUES
-(4, 10, 5, '2025-04-09 08:00:00', '2025-04-09 09:30:00', FALSE),
-(4, 10, 3, '2025-04-20 14:00:00', '2025-04-20 15:30:00', FALSE),
-(4, 10, 7, '2025-05-12 11:00:00', '2025-05-12 12:30:00', FALSE),
-(4, 10, 1, '2025-05-25 10:00:00', '2025-05-25 11:30:00', FALSE),
+(4, 10, 5, '2025-06-09 08:00:00', '2025-06-09 09:30:00', FALSE),
+(4, 10, 3, '2025-06-20 14:00:00', '2025-06-20 15:30:00', FALSE),
+(4, 10, 7, '2025-06-12 11:00:00', '2025-06-12 12:30:00', FALSE),
+(4, 10, 1, '2025-06-25 10:00:00', '2025-06-25 11:30:00', FALSE),
 (4, 10, 0, '2025-06-18 13:00:00', '2025-06-18 14:30:00', FALSE),
 (4, 10, 6, '2025-06-30 15:00:00', '2025-06-30 16:30:00', FALSE);
 
 -- Temeke Hospital (ID: 5)
 INSERT INTO slots (hospital_id, max_capacity, current_bookings, start_time, end_time, is_booked) VALUES
-(5, 10, 3, '2025-04-14 14:00:00', '2025-04-14 15:30:00', FALSE),
-(5, 10, 5, '2025-04-29 16:00:00', '2025-04-29 17:30:00', FALSE),
-(5, 10, 4, '2025-05-07 15:00:00', '2025-05-07 16:30:00', FALSE),
-(5, 10, 0, '2025-05-20 13:00:00', '2025-05-20 14:30:00', FALSE),
+(5, 10, 3, '2025-06-14 14:00:00', '2025-06-14 15:30:00', FALSE),
+(5, 10, 5, '2025-06-29 16:00:00', '2025-06-29 17:30:00', FALSE),
+(5, 10, 4, '2025-06-07 15:00:00', '2025-06-07 16:30:00', FALSE),
+(5, 10, 0, '2025-06-20 13:00:00', '2025-06-20 14:30:00', FALSE),
 (5, 10, 2, '2025-06-10 12:00:00', '2025-06-10 13:30:00', FALSE),
 (5, 10, 3, '2025-06-26 10:00:00', '2025-06-26 11:30:00', FALSE);
 
 -- Amana Regional Hospital (ID: 6)
 INSERT INTO slots (hospital_id, max_capacity, current_bookings, start_time, end_time, is_booked) VALUES
-(6, 10, 2, '2025-04-05 07:00:00', '2025-04-05 09:00:00', false),
-(6, 10, 0, '2025-04-15 12:00:00', '2025-04-15 14:00:00', false),
-(6, 10, 5, '2025-05-07 08:00:00', '2025-05-07 10:00:00', false),
-(6, 10, 1, '2025-05-18 15:00:00', '2025-05-18 17:00:00', false),
+(6, 10, 2, '2025-06-05 07:00:00', '2025-06-05 09:00:00', false),
+(6, 10, 0, '2025-06-15 12:00:00', '2025-06-15 14:00:00', false),
+(6, 10, 5, '2025-06-07 08:00:00', '2025-06-07 10:00:00', false),
+(6, 10, 1, '2025-06-18 15:00:00', '2025-06-18 17:00:00', false),
 (6, 10, 3, '2025-06-09 11:00:00', '2025-06-09 13:00:00', false),
 (6, 10, 0, '2025-06-20 16:00:00', '2025-06-20 18:00:00', false);

@@ -22,6 +22,7 @@ import com.donorapi.exception.EmailExistsException;
 import com.donorapi.exception.HospitalFoundException;
 import com.donorapi.jwt.service.JwtService;
 import com.donorapi.models.*;
+import com.donorapi.utilities.AppointmentDescription;
 import com.donorapi.utilities.AppointmentStatus;
 import com.donorapi.utilities.DateFormatter;
 

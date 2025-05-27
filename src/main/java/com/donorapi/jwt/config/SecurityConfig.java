@@ -35,6 +35,7 @@ public class SecurityConfig {
             "/api/v1/donor/register-donor",
             "/api/v1/hospital/register-hospital",
             "/api/v1/donor/login",
+            "/api/v1/hospital/authenticate",
             "/images/**"
     };
 

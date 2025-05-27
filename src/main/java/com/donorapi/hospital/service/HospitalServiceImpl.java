@@ -1,15 +1,27 @@
 package com.donorapi.hospital.service;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 import com.donorapi.donor.entity.Donation;
+import com.donorapi.donor.entity.Users;
 import com.donorapi.donor.jpa.DonorRepository;
+import com.donorapi.donor.jpa.UserRepository;
 import com.donorapi.donor.models.DonationRequest;
 import com.donorapi.exception.InvalidAppointmentStatusException;
-import com.donorapi.hospital.models.HospitalAppointment;
+import com.donorapi.hospital.entity.Hospital;
+import com.donorapi.hospital.jpa.HospitalRepository;
+import com.donorapi.hospital.models.*;
+import com.donorapi.jwt.service.JwtService;
+import com.donorapi.models.AuthRequest;
 import com.donorapi.utilities.DateFormatter;
+import com.donorapi.utilities.UserRoles;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.donorapi.hospital.entity.Appointment;
@@ -17,7 +29,6 @@ import com.donorapi.donor.entity.Donor;
 import com.donorapi.hospital.jpa.AppointmentRepository;
 import com.donorapi.donor.jpa.DonationRepository;
 import com.donorapi.utilities.AppointmentStatus;
-import com.donorapi.hospital.models.HospitalDonors;
 
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
@@ -31,6 +42,11 @@ public class HospitalServiceImpl {
     private final AppointmentRepository appointmentRepository;
     private final DonationRepository donationRepository;
     private final DonorRepository donorRepository;
+    private final HospitalRepository hospitalRepository;
+    private final AppointmentJsonConverterImpl converter;
+    private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
+    private final JwtService jwtService;
 
 
     @Transactional
@@ -134,4 +150,110 @@ public class HospitalServiceImpl {
 
         return "Donation recorded successfully";
     }
+
+    /**
+     * Authenticates a hospital user and returns hospital-specific data.
+     *
+     * @param request The authentication request containing username and password
+     * @return AuthHospitalResponse containing hospital data and authentication token
+     * @throws UsernameNotFoundException if the username is not found or password is incorrect
+     * @throws EntityNotFoundException if no hospital is associated with the user
+     * @throws IllegalArgumentException if the request is invalid
+     */
+    public AuthHospitalResponse authenticateHospital(AuthRequest request) {
+        validateAuthRequest(request);
+        log.debug("Attempting to authenticate hospital user: {}", request.getUsername());
+
+        return userRepository.findByUsername(request.getUsername())
+                .map(user -> {
+                    if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
+                        log.warn("Failed authentication attempt for username: {}", request.getUsername());
+                        throw new UsernameNotFoundException("Invalid username or password");
+                    }
+
+                    if (user.getRoles() != UserRoles.HOSPITAL) {
+                        log.warn("User {} attempted to authenticate as hospital but has role: {}", 
+                                request.getUsername(), user.getRoles());
+                        throw new UsernameNotFoundException("User is not authorized as a hospital");
+                    }
+
+                    Hospital hospital = findHospitalByUser(user);
+                    int totalAppointmentsToday = countTodayAppointments(hospital.getHospitalId());
+                    List<MonthlyDonation> monthlyDonations = getMonthlyDonationsByHospital(hospital.getHospitalId());
+                    List<FrequentDonor> frequentDonors = donationRepository.findFrequentDonorsByHospital(hospital.getHospitalId());
+
+                    String token = jwtService.generateToken(user);
+
+                    log.info("Hospital authenticated successfully: {}", hospital.getHospitalName());
+                    return new AuthHospitalResponse(
+                            hospital.getHospitalName(),
+                            token,
+                            totalAppointmentsToday,
+                            monthlyDonations,
+                            frequentDonors
+                    );
+                })
+                .orElseThrow(() -> {
+                    log.warn("Authentication failed: username not found: {}", request.getUsername());
+                    return new UsernameNotFoundException("Invalid username or password");
+                });
+    }
+    /**
+     * Validates the authentication request.
+     *
+     * @param request The authentication request to validate
+     * @throws IllegalArgumentException if the request is invalid
+     */
+    private void validateAuthRequest(AuthRequest request) {
+        if (request == null) {
+            throw new IllegalArgumentException("Authentication request cannot be null");
+        }
+        if (request.getUsername() == null || request.getUsername().trim().isEmpty()) {
+            throw new IllegalArgumentException("Username cannot be empty");
+        }
+        if (request.getPassword() == null || request.getPassword().trim().isEmpty()) {
+            throw new IllegalArgumentException("Password cannot be empty");
+        }
+    }
+
+    /**
+     * Finds a hospital by its associated user.
+     *
+     * @param user The user associated with the hospital
+     * @return The hospital entity
+     * @throws EntityNotFoundException if no hospital is found for the user
+     */
+    private Hospital findHospitalByUser(Users user) {
+        return hospitalRepository.findByUser(user)
+                .orElseThrow(() -> {
+                    log.error("Hospital not found for user: {}", user.getUsername());
+                    return new EntityNotFoundException("Hospital not found for user: " + user.getUsername());
+                });
+    }
+
+    /**
+     * Counts the number of appointments for a hospital on the current day.
+     *
+     * @param hospitalId The ID of the hospital
+     * @return The number of appointments today
+     */
+    private int countTodayAppointments(Long hospitalId) {
+        LocalDate today = LocalDate.now();
+        List<Appointment> appointments = appointmentRepository.findAppointmentsBySlot_Hospital_HospitalId(hospitalId);
+        return (int) appointments.stream()
+                .filter(a -> a.getAppointmentDate().equals(today))
+                .count();
+    }
+
+    private List<MonthlyDonation> getMonthlyDonationsByHospital(Long hospitalId) {
+        List<Object[]> results = donationRepository.findMonthlyDonationsByHospitalNative(hospitalId);
+
+        return results.stream()
+                .map(obj -> new MonthlyDonation(
+                        (String) obj[0],
+                        ((Number) obj[1]).longValue()
+                ))
+                .collect(Collectors.toList());
+    }
 }
+

@@ -1,6 +1,7 @@
 package com.donorapi.hospital.controller;
 
 import com.donorapi.donor.models.DonationRequest;
+import com.donorapi.hospital.models.AuthHospitalResponse;
 import com.donorapi.models.AuthRequest;
 import com.donorapi.hospital.models.HospitalAppointment;
 import com.donorapi.hospital.models.HospitalDonors;
@@ -32,11 +33,11 @@ public class HospitalController {
     }
 
     @PostMapping("/authenticate")
-    public ResponseEntity<String> authenticateHospital(@RequestBody AuthRequest request) {
+    public ResponseEntity<AuthHospitalResponse> authenticateHospital(@RequestBody AuthRequest request) {
         if (request == null){
             throw new IllegalArgumentException("Username and password are required");
         }
-        return null;
+        return ResponseEntity.ok(hospitalService.authenticateHospital(request));
     }
 
     @PostMapping("/appointments/{appointmentId}/approval")

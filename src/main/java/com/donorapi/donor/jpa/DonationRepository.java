@@ -1,6 +1,8 @@
 package com.donorapi.donor.jpa;
 
+import com.donorapi.hospital.models.FrequentDonor;
 import com.donorapi.hospital.models.HospitalDonors;
+import com.donorapi.hospital.models.MonthlyDonation;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -40,4 +42,34 @@ public interface DonationRepository extends JpaRepository<Donation,Integer> {
             "ORDER BY d.donationDate DESC")
     LocalDateTime findTopByDonorIdOrderByDonationDateDesc(@Param("donorId") Integer donorId);
 
+    @Query(value = """
+    SELECT TO_CHAR(d.donation_date, 'YYYY-MM') AS month, COUNT(*) AS count
+    FROM donations d
+    JOIN appointment a ON d.appointment_id = a.id
+    JOIN slots s ON a.slot_id = s.id
+    WHERE s.hospital_id = :hospitalId
+      AND EXTRACT(YEAR FROM d.donation_date) = EXTRACT(YEAR FROM CURRENT_DATE)
+    GROUP BY TO_CHAR(d.donation_date, 'YYYY-MM')
+    ORDER BY TO_CHAR(d.donation_date, 'YYYY-MM')
+    """, nativeQuery = true)
+    List<Object[]> findMonthlyDonationsByHospitalNative(@Param("hospitalId") Long hospitalId);
+
+    @Query("""
+    SELECT new com.donorapi.hospital.models.FrequentDonor(
+        d.donorId,
+        d.fullName,
+        d.bloodType,
+        COUNT(do),
+        d.user.username
+    )
+    FROM Donation do
+    JOIN do.appointment a
+    JOIN a.donor d
+    JOIN a.slot s
+    WHERE s.hospital.hospitalId = :hospitalId
+    GROUP BY d.donorId, d.fullName, d.bloodType, d.user.username
+    ORDER BY COUNT(do) DESC
+    LIMIT 10
+    """)
+    List<FrequentDonor> findFrequentDonorsByHospital(@Param("hospitalId") Long hospitalId);
 }

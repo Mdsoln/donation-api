@@ -1,4 +1,4 @@
-package com.donorapi.controller;
+package com.donorapi.report.controller;
 
 import com.donorapi.report.model.DonorReportDTO;
 import com.donorapi.report.model.HospitalReportDTO;
