@@ -14,11 +14,14 @@ import com.donorapi.donor.jpa.UserRepository;
 import com.donorapi.donor.models.DonationRequest;
 import com.donorapi.exception.InvalidAppointmentStatusException;
 import com.donorapi.hospital.entity.Hospital;
+import com.donorapi.hospital.entity.UrgentRequest;
 import com.donorapi.hospital.jpa.HospitalRepository;
+import com.donorapi.hospital.jpa.UrgentRequestRepository;
 import com.donorapi.hospital.models.*;
 import com.donorapi.jwt.service.JwtService;
 import com.donorapi.models.AuthRequest;
 import com.donorapi.utilities.DateFormatter;
+import com.donorapi.utilities.UrgentRequestStatus;
 import com.donorapi.utilities.UserRoles;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -45,6 +48,7 @@ public class HospitalServiceImpl {
     private final HospitalRepository hospitalRepository;
     private final AppointmentJsonConverterImpl converter;
     private final UserRepository userRepository;
+    private final UrgentRequestRepository urgentRequestRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
 
@@ -181,6 +185,7 @@ public class HospitalServiceImpl {
                     int totalAppointmentsToday = countTodayAppointments(hospital.getHospitalId());
                     List<MonthlyDonation> monthlyDonations = getMonthlyDonationsByHospital(hospital.getHospitalId());
                     List<FrequentDonor> frequentDonors = donationRepository.findFrequentDonorsByHospital(hospital.getHospitalId());
+                    List<UrgentRequestSummary> urgentRequests = getUrgentRequestsForHospital(hospital);
 
                     String token = jwtService.generateToken(user);
 
@@ -190,7 +195,8 @@ public class HospitalServiceImpl {
                             token,
                             totalAppointmentsToday,
                             monthlyDonations,
-                            frequentDonors
+                            frequentDonors,
+                            urgentRequests
                     );
                 })
                 .orElseThrow(() -> {
@@ -255,5 +261,22 @@ public class HospitalServiceImpl {
                 ))
                 .collect(Collectors.toList());
     }
-}
 
+    /**
+     * Gets urgent requests for a hospital and converts them to UrgentRequestSummary objects.
+     *
+     * @param hospital The hospital entity
+     * @return A list of UrgentRequestSummary objects
+     */
+    private List<UrgentRequestSummary> getUrgentRequestsForHospital(Hospital hospital) {
+        List<UrgentRequest> urgentRequests = urgentRequestRepository.findByHospital(hospital);
+
+        return urgentRequests.stream()
+                .map(request -> new UrgentRequestSummary(
+                        request.getRequestTime(),
+                        request.getBloodType(),
+                        request.getStatus()
+                ))
+                .collect(Collectors.toList());
+    }
+}

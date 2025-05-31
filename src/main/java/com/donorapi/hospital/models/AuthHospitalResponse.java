@@ -7,6 +7,7 @@ public record AuthHospitalResponse(
         String token,
         Integer totalAppointment, //per day
         List<MonthlyDonation> monthlyDonations, // donations per month for graphing
-        List<FrequentDonor> frequentDonors // frequent donors with profile name
+        List<FrequentDonor> frequentDonors, // frequent donors with profile name
+        List<UrgentRequestSummary> urgentRequests // urgent requests with time, blood type, and status
 ) {
 }
