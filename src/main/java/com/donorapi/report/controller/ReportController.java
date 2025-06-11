@@ -34,7 +34,6 @@ public class ReportController {
      * @return The hospital report data
      */
     @PostMapping("/hospital/{hospitalId}")
-    @PreAuthorize("hasRole('HOSPITAL')")
     @Operation(summary = "Generate a hospital report", description = "Generate a report for a specific hospital with various metrics")
     public ResponseEntity<HospitalReportDTO> generateHospitalReport(
             @PathVariable Long hospitalId,
@@ -57,7 +56,6 @@ public class ReportController {
      * @return The donor report data
      */
     @PostMapping("/donor/{donorId}")
-    @PreAuthorize("hasRole('DONOR')")
     @Operation(summary = "Generate a donor report", description = "Generate a report for a specific donor with various metrics")
     public ResponseEntity<DonorReportDTO> generateDonorReport(
             @PathVariable Integer donorId,
@@ -79,7 +77,6 @@ public class ReportController {
      * @return List of hospital reports for comparison
      */
     @PostMapping("/hospital/comparison")
-    @PreAuthorize("hasRole('HOSPITAL')")
     @Operation(summary = "Generate a hospital comparison report", description = "Generate a comparison report for all hospitals")
     public ResponseEntity<List<HospitalReportDTO>> generateHospitalComparisonReport(
             @RequestBody ReportRequest request) {
@@ -101,7 +98,6 @@ public class ReportController {
      * @return The PDF file as a Resource
      */
     @PostMapping("/hospital/{hospitalId}/export/pdf")
-    @PreAuthorize("hasRole('HOSPITAL')")
     @Operation(summary = "Export a hospital report as PDF", description = "Generate and export a hospital report as PDF")
     public ResponseEntity<Resource> exportHospitalReportAsPdf(
             @PathVariable Long hospitalId,
@@ -123,7 +119,6 @@ public class ReportController {
      * @return The Excel file as a Resource
      */
     @PostMapping("/hospital/{hospitalId}/export/excel")
-    @PreAuthorize("hasRole('HOSPITAL')")
     @Operation(summary = "Export a hospital report as Excel", description = "Generate and export a hospital report as Excel")
     public ResponseEntity<Resource> exportHospitalReportAsExcel(
             @PathVariable Long hospitalId,
@@ -145,7 +140,6 @@ public class ReportController {
      * @return The PDF file as a Resource
      */
     @PostMapping("/donor/{donorId}/export/pdf")
-    @PreAuthorize("hasRole('DONOR')")
     @Operation(summary = "Export a donor report as PDF", description = "Generate and export a donor report as PDF")
     public ResponseEntity<Resource> exportDonorReportAsPdf(
             @PathVariable Integer donorId,
@@ -167,7 +161,6 @@ public class ReportController {
      * @return The Excel file as a Resource
      */
     @PostMapping("/donor/{donorId}/export/excel")
-    @PreAuthorize("hasRole('DONOR')")
     @Operation(summary = "Export a donor report as Excel", description = "Generate and export a donor report as Excel")
     public ResponseEntity<Resource> exportDonorReportAsExcel(
             @PathVariable Integer donorId,
