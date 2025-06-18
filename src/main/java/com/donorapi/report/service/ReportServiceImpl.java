@@ -259,20 +259,12 @@ public class ReportServiceImpl implements ReportService {
                 .donorId(donorId)
                 .donorName(donor.getFullName())
                 .bloodType(donor.getBloodType())
-                .reportPeriod(getReportPeriodString(request))
-                .startDate(startDate)
-                .endDate(endDate)
+                .lastDonation(startDate)
+                .eligibleDate(endDate)
                 .totalDonations(totalDonations)
-                .totalVolumeMl(totalVolumeMl)
-                .firstDonationDate(firstDonationDate)
-                .lastDonationDate(lastDonationDate)
-                .totalAppointments(totalAppointments)
                 .completedAppointments(completedAppointments)
                 .scheduledAppointments(scheduledAppointments)
                 .expiredAppointments(expiredAppointments)
-                .cancelledAppointments(cancelledAppointments)
-                .periodData(periodData)
-                .hospitalData(hospitalData)
                 .build();
     }
 

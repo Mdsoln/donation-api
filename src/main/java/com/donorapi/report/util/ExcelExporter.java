@@ -166,100 +166,27 @@ public class ExcelExporter {
                 bloodTypeCell.setCellValue("Blood Type: " + report.getBloodType());
             }
             
-            // Add report period
-            Row periodRow = summarySheet.createRow(3);
-            Cell periodCell = periodRow.createCell(0);
-            periodCell.setCellValue("Period: " + report.getReportPeriod());
-            
+
             // Add donation summary
             Row donationHeaderRow = summarySheet.createRow(5);
             createHeaderRow(donationHeaderRow, headerStyle, "Donation Metric", "Value");
             
             int rowNum = 6;
             createDataRow(summarySheet.createRow(rowNum++), dataStyle, "Total Donations", String.valueOf(report.getTotalDonations()));
-            createDataRow(summarySheet.createRow(rowNum++), dataStyle, "Total Volume (ml)", String.format("%.2f", report.getTotalVolumeMl()));
-            
-            if (report.getFirstDonationDate() != null) {
-                createDataRow(summarySheet.createRow(rowNum++), dataStyle, "First Donation", report.getFirstDonationDate().format(DATE_FORMATTER));
-            }
-            
-            if (report.getLastDonationDate() != null) {
-                createDataRow(summarySheet.createRow(rowNum++), dataStyle, "Last Donation", report.getLastDonationDate().format(DATE_FORMATTER));
-            }
-            
+
             // Add appointment summary
             Row appointmentHeaderRow = summarySheet.createRow(rowNum + 1);
             createHeaderRow(appointmentHeaderRow, headerStyle, "Appointment Metric", "Value");
             
             rowNum += 2;
-            createDataRow(summarySheet.createRow(rowNum++), dataStyle, "Total Appointments", String.valueOf(report.getTotalAppointments()));
             createDataRow(summarySheet.createRow(rowNum++), dataStyle, "Completed", String.valueOf(report.getCompletedAppointments()));
             createDataRow(summarySheet.createRow(rowNum++), dataStyle, "Scheduled", String.valueOf(report.getScheduledAppointments()));
             createDataRow(summarySheet.createRow(rowNum++), dataStyle, "Expired", String.valueOf(report.getExpiredAppointments()));
-            createDataRow(summarySheet.createRow(rowNum++), dataStyle, "Cancelled", String.valueOf(report.getCancelledAppointments()));
             
             // Auto-size columns
             summarySheet.autoSizeColumn(0);
             summarySheet.autoSizeColumn(1);
-            
-            // Create Donation History sheet if available
-            if (report.getPeriodData() != null && !report.getPeriodData().isEmpty()) {
-                Sheet historySheet = workbook.createSheet("Donation History");
-                
-                // Add header
-                Row headerRow = historySheet.createRow(0);
-                createHeaderRow(headerRow, headerStyle, "Period", "Donations", "Volume (ml)");
-                
-                // Add data rows
-                rowNum = 1;
-                for (DonorReportDTO.PeriodData data : report.getPeriodData()) {
-                    Row row = historySheet.createRow(rowNum++);
-                    int colNum = 0;
-                    row.createCell(colNum++).setCellValue(data.getPeriod());
-                    row.createCell(colNum++).setCellValue(data.getDonations());
-                    row.createCell(colNum++).setCellValue(data.getVolumeMl());
-                    
-                    // Apply style
-                    for (int i = 0; i < colNum; i++) {
-                        row.getCell(i).setCellStyle(dataStyle);
-                    }
-                }
-                
-                // Auto-size columns
-                for (int i = 0; i < 3; i++) {
-                    historySheet.autoSizeColumn(i);
-                }
-            }
-            
-            // Create Hospital Breakdown sheet if available
-            if (report.getHospitalData() != null && !report.getHospitalData().isEmpty()) {
-                Sheet hospitalSheet = workbook.createSheet("Hospital Breakdown");
-                
-                // Add header
-                Row headerRow = hospitalSheet.createRow(0);
-                createHeaderRow(headerRow, headerStyle, "Hospital", "Donations", "Volume (ml)", "Percentage");
-                
-                // Add data rows
-                rowNum = 1;
-                for (DonorReportDTO.HospitalData data : report.getHospitalData()) {
-                    Row row = hospitalSheet.createRow(rowNum++);
-                    int colNum = 0;
-                    row.createCell(colNum++).setCellValue(data.getHospitalName());
-                    row.createCell(colNum++).setCellValue(data.getDonations());
-                    row.createCell(colNum++).setCellValue(data.getVolumeMl());
-                    row.createCell(colNum++).setCellValue(String.format("%.2f%%", data.getPercentage()));
-                    
-                    // Apply style
-                    for (int i = 0; i < colNum; i++) {
-                        row.getCell(i).setCellStyle(dataStyle);
-                    }
-                }
-                
-                // Auto-size columns
-                for (int i = 0; i < 4; i++) {
-                    hospitalSheet.autoSizeColumn(i);
-                }
-            }
+
             
             // Write to byte array
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();

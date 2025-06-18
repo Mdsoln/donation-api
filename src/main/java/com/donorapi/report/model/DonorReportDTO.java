@@ -20,34 +20,22 @@ public class DonorReportDTO {
     private Integer donorId;
     private String donorName;
     private String bloodType;
-    private String reportPeriod; // e.g., "Q1 2023", "2023", "All Time", etc.
-    private LocalDate startDate;
-    private LocalDate endDate;
-    
+    private String location;
+
     // Donation statistics
     private int totalDonations;
-    private double totalVolumeMl;
-    private LocalDate firstDonationDate;
-    private LocalDate lastDonationDate;
+    private LocalDate lastDonation;
+    private LocalDate eligibleDate;
     
     // Appointment statistics
-    private int totalAppointments;
     private int completedAppointments;
     private int scheduledAppointments;
     private int expiredAppointments;
-    private int cancelledAppointments;
-    
-    // Request statistics
-    private int totalRequests;
-    private int acceptedRequests;
-    private int rejectedRequests;
-    
-    // Donation history by period (quarterly, yearly)
-    private List<PeriodData> periodData;
-    
+
     // Hospital breakdown
-    private List<HospitalData> hospitalData;
-    
+    private String topDonatingHospital;
+    private String activeMonth;
+
     @Data
     @Builder
     @NoArgsConstructor

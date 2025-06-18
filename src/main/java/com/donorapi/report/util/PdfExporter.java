@@ -9,7 +9,6 @@ import org.springframework.stereotype.Component;
 
 import java.io.ByteArrayOutputStream;
 import java.time.format.DateTimeFormatter;
-import java.util.stream.Collectors;
 
 /**
  * Utility class for exporting reports to PDF format
@@ -134,106 +133,47 @@ public class PdfExporter {
             PdfWriter.getInstance(document, baos);
             
             document.open();
-            
+
+            Font sectionRedFont = new Font(Font.FontFamily.HELVETICA, 14, Font.BOLD, BaseColor.RED);
             // Add title
             Paragraph title = new Paragraph("Donor Report", TITLE_FONT);
             title.setAlignment(Element.ALIGN_CENTER);
             document.add(title);
             
             // Add donor info
-            Paragraph donorInfo = new Paragraph("Donor: " + report.getDonorName(), SUBTITLE_FONT);
-            donorInfo.setAlignment(Element.ALIGN_CENTER);
-            document.add(donorInfo);
-            
-            // Add blood type
-            if (report.getBloodType() != null) {
-                Paragraph bloodType = new Paragraph("Blood Type: " + report.getBloodType(), SUBTITLE_FONT);
-                bloodType.setAlignment(Element.ALIGN_CENTER);
-                document.add(bloodType);
-            }
-            
-            // Add report period
-            Paragraph period = new Paragraph("Period: " + report.getReportPeriod(), SUBTITLE_FONT);
-            period.setAlignment(Element.ALIGN_CENTER);
-            document.add(period);
-            
+            Paragraph header = new Paragraph();
+            header.setAlignment(Element.ALIGN_CENTER);
+            header.add(new Paragraph("Donor: " + report.getDonorName(), NORMAL_FONT));
+            header.add(new Paragraph("Blood Group: " + report.getBloodType(), NORMAL_FONT));
+            header.add(new Paragraph("Location: " + report.getLocation(), new Font(Font.FontFamily.HELVETICA, 12, Font.BOLD, BaseColor.BLUE)));
+            document.add(header);
             document.add(Chunk.NEWLINE);
-            
-            // Add donation summary section
-            document.add(new Paragraph("Donation Summary", SECTION_FONT));
+
+            document.add(new Paragraph("Donation Summary", sectionRedFont));
+            document.add(new Paragraph("Total Donations: " + report.getTotalDonations(), NORMAL_FONT));
+            document.add(new Paragraph("Last Donation" + report.getLastDonation(), NORMAL_FONT));
+            document.add(new Paragraph("Eligible Date: " + report.getEligibleDate().format(DATE_FORMATTER), NORMAL_FONT));
+            document.add(Chunk.NEWLINE);
+
             PdfPTable donationTable = new PdfPTable(2);
             donationTable.setWidthPercentage(100);
-            
-            addTableRow(donationTable, "Total Donations:", String.valueOf(report.getTotalDonations()));
-            addTableRow(donationTable, "Total Volume:", String.format("%.2f ml", report.getTotalVolumeMl()));
-            
-            if (report.getFirstDonationDate() != null) {
-                addTableRow(donationTable, "First Donation:", report.getFirstDonationDate().format(DATE_FORMATTER));
-            }
-            
-            if (report.getLastDonationDate() != null) {
-                addTableRow(donationTable, "Last Donation:", report.getLastDonationDate().format(DATE_FORMATTER));
-            }
-            
-            document.add(donationTable);
+            donationTable.getDefaultCell().setPadding(8); // mimic inner padding
+            donationTable.getDefaultCell().setBorder(Rectangle.BOX);
+
+            document.add(new Paragraph("Top Donation Center", sectionRedFont));
+            //document.add(new Paragraph(report.getTopDonationCenter(), NORMAL_FONT));
             document.add(Chunk.NEWLINE);
-            
-            // Add appointment summary section
-            document.add(new Paragraph("Appointment Summary", SECTION_FONT));
-            PdfPTable appointmentTable = new PdfPTable(2);
-            appointmentTable.setWidthPercentage(100);
-            
-            addTableRow(appointmentTable, "Total Appointments:", String.valueOf(report.getTotalAppointments()));
-            addTableRow(appointmentTable, "Completed:", String.valueOf(report.getCompletedAppointments()));
-            addTableRow(appointmentTable, "Scheduled:", String.valueOf(report.getScheduledAppointments()));
-            addTableRow(appointmentTable, "Expired:", String.valueOf(report.getExpiredAppointments()));
-            addTableRow(appointmentTable, "Cancelled:", String.valueOf(report.getCancelledAppointments()));
-            
-            document.add(appointmentTable);
+
+            document.add(new Paragraph("Most Active Month", sectionRedFont));
+            //document.add(new Paragraph(report.getMostActiveMonth(), NORMAL_FONT));
             document.add(Chunk.NEWLINE);
-            
-            // Add period data if available
-            if (report.getPeriodData() != null && !report.getPeriodData().isEmpty()) {
-                document.add(new Paragraph("Donation History", SECTION_FONT));
-                PdfPTable periodTable = new PdfPTable(3);
-                periodTable.setWidthPercentage(100);
-                
-                // Add header
-                addTableHeader(periodTable, "Period", "Donations", "Volume (ml)");
-                
-                // Add data rows
-                for (DonorReportDTO.PeriodData data : report.getPeriodData()) {
-                    addTableRow(periodTable, 
-                            data.getPeriod(), 
-                            String.valueOf(data.getDonations()), 
-                            String.format("%.2f", data.getVolumeMl()));
-                }
-                
-                document.add(periodTable);
-                document.add(Chunk.NEWLINE);
-            }
-            
-            // Add hospital data if available
-            if (report.getHospitalData() != null && !report.getHospitalData().isEmpty()) {
-                document.add(new Paragraph("Hospital Breakdown", SECTION_FONT));
-                PdfPTable hospitalTable = new PdfPTable(4);
-                hospitalTable.setWidthPercentage(100);
-                
-                // Add header
-                addTableHeader(hospitalTable, "Hospital", "Donations", "Volume (ml)", "Percentage");
-                
-                // Add data rows
-                for (DonorReportDTO.HospitalData data : report.getHospitalData()) {
-                    addTableRow(hospitalTable, 
-                            data.getHospitalName(), 
-                            String.valueOf(data.getDonations()), 
-                            String.format("%.2f", data.getVolumeMl()),
-                            String.format("%.2f%%", data.getPercentage()));
-                }
-                
-                document.add(hospitalTable);
-            }
-            
+
+            Paragraph footer = new Paragraph("All copyrights are reserved",
+                    new Font(Font.FontFamily.HELVETICA, 10, Font.ITALIC, BaseColor.GRAY));
+            footer.setAlignment(Element.ALIGN_CENTER);
+            document.add(footer);
+            document.add(Chunk.NEWLINE);
+
             document.close();
             return baos.toByteArray();
             
