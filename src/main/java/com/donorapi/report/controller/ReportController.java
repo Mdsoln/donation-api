@@ -130,7 +130,7 @@ public class ReportController {
             return ResponseEntity.badRequest().build();
         }
         
-        return reportService.exportHospitalReportAsExcel(hospitalId, request);
+        return null;
     }
 
     /**
@@ -154,24 +154,4 @@ public class ReportController {
         return reportService.exportDonorReportAsPdf(donorId, request);
     }
 
-    /**
-     * Export a donor report as Excel
-     * @param donorId The ID of the donor
-     * @param request The report request parameters
-     * @return The Excel file as a Resource
-     */
-    @PostMapping("/donor/{donorId}/export/excel")
-    @Operation(summary = "Export a donor report as Excel", description = "Generate and export a donor report as Excel")
-    public ResponseEntity<Resource> exportDonorReportAsExcel(
-            @PathVariable Integer donorId,
-            @RequestBody ReportRequest request) {
-        
-        log.info("Exporting donor report as Excel for donor ID: {}", donorId);
-        
-        if (!request.isValidRequest()) {
-            return ResponseEntity.badRequest().build();
-        }
-        
-        return reportService.exportDonorReportAsExcel(donorId, request);
-    }
 }

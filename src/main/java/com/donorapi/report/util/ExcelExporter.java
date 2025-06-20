@@ -1,15 +1,17 @@
 package com.donorapi.report.util;
 
-import com.donorapi.report.model.DonorReportDTO;
+
 import com.donorapi.report.model.HospitalReportDTO;
+import com.itextpdf.layout.element.Paragraph;
 import lombok.extern.log4j.Log4j2;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.stereotype.Component;
-
 import java.io.ByteArrayOutputStream;
 import java.time.format.DateTimeFormatter;
-import java.util.List;
+
+
+
 
 /**
  * Utility class for exporting reports to Excel format
@@ -31,7 +33,7 @@ public class ExcelExporter {
             CellStyle headerStyle = createHeaderStyle(workbook);
             CellStyle dataStyle = createDataStyle(workbook);
             
-            // Create Summary sheet
+            // Create a Summary sheet
             Sheet summarySheet = workbook.createSheet("Summary");
             
             // Add title
@@ -44,7 +46,7 @@ public class ExcelExporter {
             Cell hospitalCell = hospitalRow.createCell(0);
             hospitalCell.setCellValue("Hospital: " + report.getHospitalName());
             
-            // Add report period
+            // Add a report period
             Row periodRow = summarySheet.createRow(2);
             Cell periodCell = periodRow.createCell(0);
             periodCell.setCellValue("Period: " + report.getReportPeriod());
@@ -65,7 +67,7 @@ public class ExcelExporter {
             summarySheet.autoSizeColumn(0);
             summarySheet.autoSizeColumn(1);
             
-            // Create Quarterly Data sheet if available
+            // Create a Quarterly Data sheet if available
             if (report.getQuarterlyData() != null && !report.getQuarterlyData().isEmpty()) {
                 Sheet quarterlySheet = workbook.createSheet("Quarterly Data");
                 
@@ -95,7 +97,7 @@ public class ExcelExporter {
                 }
             }
             
-            // Create Blood Type Distribution sheet if available
+            // Create a Blood Type Distribution sheet if available
             if (report.getBloodTypeDistribution() != null && !report.getBloodTypeDistribution().isEmpty()) {
                 Sheet bloodTypeSheet = workbook.createSheet("Blood Type Distribution");
                 
@@ -124,7 +126,7 @@ public class ExcelExporter {
                 }
             }
             
-            // Write to byte array
+            // Write to a byte array
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
             workbook.write(outputStream);
             return outputStream.toByteArray();
@@ -140,63 +142,16 @@ public class ExcelExporter {
      * @param report The donor report data
      * @return The Excel file as a byte array
      */
-    public byte[] exportDonorReportToExcel(DonorReportDTO report) {
-        try (Workbook workbook = new XSSFWorkbook()) {
-            // Create styles
-            CellStyle headerStyle = createHeaderStyle(workbook);
-            CellStyle dataStyle = createDataStyle(workbook);
-            
-            // Create Summary sheet
-            Sheet summarySheet = workbook.createSheet("Summary");
-            
-            // Add title
-            Row titleRow = summarySheet.createRow(0);
-            Cell titleCell = titleRow.createCell(0);
-            titleCell.setCellValue("Donor Report");
-            
-            // Add donor info
-            Row donorRow = summarySheet.createRow(1);
-            Cell donorCell = donorRow.createCell(0);
-            donorCell.setCellValue("Donor: " + report.getDonorName());
-            
-            // Add blood type if available
-            if (report.getBloodType() != null) {
-                Row bloodTypeRow = summarySheet.createRow(2);
-                Cell bloodTypeCell = bloodTypeRow.createCell(0);
-                bloodTypeCell.setCellValue("Blood Type: " + report.getBloodType());
-            }
-            
 
-            // Add donation summary
-            Row donationHeaderRow = summarySheet.createRow(5);
-            createHeaderRow(donationHeaderRow, headerStyle, "Donation Metric", "Value");
-            
-            int rowNum = 6;
-            createDataRow(summarySheet.createRow(rowNum++), dataStyle, "Total Donations", String.valueOf(report.getTotalDonations()));
 
-            // Add appointment summary
-            Row appointmentHeaderRow = summarySheet.createRow(rowNum + 1);
-            createHeaderRow(appointmentHeaderRow, headerStyle, "Appointment Metric", "Value");
-            
-            rowNum += 2;
-            createDataRow(summarySheet.createRow(rowNum++), dataStyle, "Completed", String.valueOf(report.getCompletedAppointments()));
-            createDataRow(summarySheet.createRow(rowNum++), dataStyle, "Scheduled", String.valueOf(report.getScheduledAppointments()));
-            createDataRow(summarySheet.createRow(rowNum++), dataStyle, "Expired", String.valueOf(report.getExpiredAppointments()));
-            
-            // Auto-size columns
-            summarySheet.autoSizeColumn(0);
-            summarySheet.autoSizeColumn(1);
 
-            
-            // Write to byte array
-            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-            workbook.write(outputStream);
-            return outputStream.toByteArray();
-            
-        } catch (Exception e) {
-            log.error("Error exporting donor report to Excel", e);
-            throw new RuntimeException("Error exporting donor report to Excel", e);
-        }
+    // Helper for centered key-value
+    private Paragraph centeredKeyValue(String key, String value, com.itextpdf.kernel.font.PdfFont regular, com.itextpdf.kernel.font.PdfFont bold) {
+        return new Paragraph()
+                .add(new com.itextpdf.layout.element.Text(key + ": ").setFont(bold).setFontSize(15))
+                .add(new com.itextpdf.layout.element.Text(value).setFont(regular).setFontSize(15))
+                .setTextAlignment(com.itextpdf.layout.properties.TextAlignment.CENTER)
+                .setMarginBottom(5);
     }
     
     // Helper methods

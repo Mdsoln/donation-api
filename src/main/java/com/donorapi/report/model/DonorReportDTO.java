@@ -33,7 +33,7 @@ public class DonorReportDTO {
     private int expiredAppointments;
 
     // Hospital breakdown
-    private String topDonatingHospital;
+    private String topDonatingCenter;
     private String activeMonth;
 
     @Data

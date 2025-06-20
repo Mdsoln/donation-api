@@ -50,7 +50,7 @@ public interface ReportService {
      * @param request The report request parameters
      * @return The Excel file as a Resource
      */
-    ResponseEntity<Resource> exportHospitalReportAsExcel(Long hospitalId, ReportRequest request);
+    //ResponseEntity<Resource> exportHospitalReportAsExcel(Long hospitalId, ReportRequest request);
     
     /**
      * Export a donor report as PDF
@@ -66,5 +66,5 @@ public interface ReportService {
      * @param request The report request parameters
      * @return The Excel file as a Resource
      */
-    ResponseEntity<Resource> exportDonorReportAsExcel(Integer donorId, ReportRequest request);
+    //ResponseEntity<Resource> exportDonorReportAsExcel(Integer donorId, ReportRequest request);
 }

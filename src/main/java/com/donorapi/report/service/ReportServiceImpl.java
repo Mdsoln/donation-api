@@ -287,19 +287,19 @@ public class ReportServiceImpl implements ReportService {
     @Override
     public ResponseEntity<Resource> exportHospitalReportAsPdf(Long hospitalId, ReportRequest request) {
         HospitalReportDTO report = generateHospitalReport(hospitalId, request);
-        byte[] pdfBytes = pdfExporter.exportHospitalReportToPdf(report);
+        //byte[] pdfBytes = pdfExporter.exportHospitalReportToPdf(report);
 
-        return createResourceResponse(pdfBytes, "hospital_report_" + hospitalId + ".pdf", MediaType.APPLICATION_PDF);
+        return null;
     }
 
-    @Override
+    /*@Override
     public ResponseEntity<Resource> exportHospitalReportAsExcel(Long hospitalId, ReportRequest request) {
         HospitalReportDTO report = generateHospitalReport(hospitalId, request);
         byte[] excelBytes = excelExporter.exportHospitalReportToExcel(report);
 
         return createResourceResponse(excelBytes, "hospital_report_" + hospitalId + ".xlsx", 
                 MediaType.parseMediaType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"));
-    }
+    }*/
 
     @Override
     public ResponseEntity<Resource> exportDonorReportAsPdf(Integer donorId, ReportRequest request) {
@@ -309,14 +309,14 @@ public class ReportServiceImpl implements ReportService {
         return createResourceResponse(pdfBytes, "donor_report_" + donorId + ".pdf", MediaType.APPLICATION_PDF);
     }
 
-    @Override
+    /*@Override
     public ResponseEntity<Resource> exportDonorReportAsExcel(Integer donorId, ReportRequest request) {
         DonorReportDTO report = generateDonorReport(donorId, request);
         byte[] excelBytes = excelExporter.exportDonorReportToExcel(report);
 
         return createResourceResponse(excelBytes, "donor_report_" + donorId + ".xlsx", 
                 MediaType.parseMediaType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"));
-    }
+    }*/
 
     // Helper methods
 
