@@ -2,7 +2,6 @@ package com.donorapi.report.util;
 
 
 import com.donorapi.report.model.HospitalReportDTO;
-import com.itextpdf.layout.element.Paragraph;
 import lombok.extern.log4j.Log4j2;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
@@ -136,23 +135,7 @@ public class ExcelExporter {
             throw new RuntimeException("Error exporting hospital report to Excel", e);
         }
     }
-    
-    /**
-     * Export a donor report to Excel
-     * @param report The donor report data
-     * @return The Excel file as a byte array
-     */
 
-
-
-    // Helper for centered key-value
-    private Paragraph centeredKeyValue(String key, String value, com.itextpdf.kernel.font.PdfFont regular, com.itextpdf.kernel.font.PdfFont bold) {
-        return new Paragraph()
-                .add(new com.itextpdf.layout.element.Text(key + ": ").setFont(bold).setFontSize(15))
-                .add(new com.itextpdf.layout.element.Text(value).setFont(regular).setFontSize(15))
-                .setTextAlignment(com.itextpdf.layout.properties.TextAlignment.CENTER)
-                .setMarginBottom(5);
-    }
     
     // Helper methods
     
