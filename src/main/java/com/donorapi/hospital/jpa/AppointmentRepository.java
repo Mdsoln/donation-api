@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -30,4 +31,7 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Long> 
     List<Appointment> findAppointmentsBySlot_Hospital_HospitalId(Long slotHospitalHospitalId);
 
     List<Appointment> findByDonorOrderByAppointmentDateDesc(Donor donor);
+
+    @Query("SELECT a FROM Appointment a WHERE a.donor.donorId = :donorId AND a.appointmentDate BETWEEN :start AND :end")
+    List<Appointment> findAppointmentsByDonorAndDateRange(@Param("donorId") Integer donorId, @Param("start") LocalDate startDate, @Param("end") LocalDate endDate);
 }

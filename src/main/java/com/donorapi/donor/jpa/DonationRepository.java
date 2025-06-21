@@ -2,7 +2,6 @@ package com.donorapi.donor.jpa;
 
 import com.donorapi.hospital.models.FrequentDonor;
 import com.donorapi.hospital.models.HospitalDonors;
-import com.donorapi.hospital.models.MonthlyDonation;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -10,6 +9,7 @@ import org.springframework.data.repository.query.Param;
 import com.donorapi.donor.entity.Donation;
 import com.donorapi.donor.entity.Donor;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -72,4 +72,7 @@ public interface DonationRepository extends JpaRepository<Donation,Integer> {
     LIMIT 10
     """)
     List<FrequentDonor> findFrequentDonorsByHospital(@Param("hospitalId") Long hospitalId);
+
+    @Query("SELECT d FROM Donation d JOIN d.appointment a WHERE a.donor.donorId = :donorId AND a.appointmentDate BETWEEN :start AND :end")
+    List<Donation> findDonationsByDonorAndDateRange(@Param("donorId") Integer donorId, @Param("start") LocalDate startDate, @Param("end") LocalDate endDate);
 }
