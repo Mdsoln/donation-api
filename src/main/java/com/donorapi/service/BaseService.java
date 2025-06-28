@@ -75,7 +75,7 @@ public class BaseService {
             throw new EmailExistsException("EMAIL_ALREADY_EXISTS", "A donor with this email already exists.");
         });
         Users user = new Users();
-        user.setUsername(donorRequest.getUsername());
+        user.setUsername(donorRequest.getEmail());
         user.setRoles(UserRoles.DONOR);
         user.setPassword(passwordEncoder.encode(donorRequest.getPassword()));
         userRepository.save(user);
@@ -164,6 +164,7 @@ public class BaseService {
                     final double height = donor.getHeight();
                     final double weight = donor.getWeight();
                     final String gender = donor.getGender();
+                    final String ageGroup = donor.getAge();
 
                     final int donations = donorRepository.countByAppointmentDonor(donor);
                     final Optional<Appointment> upcomingAppointmentOpt = appointmentRepository.findByDonorAndStatusOrderBySlotEndTimeDesc(donor, AppointmentStatus.SCHEDULED);
@@ -190,6 +191,7 @@ public class BaseService {
                             .height(height)
                             .weight(weight)
                             .gender(gender)
+                            .ageGroup(ageGroup)
                             .lastDonation(lastDonation)
                             .latestAppointment(latestAppointment)
                             .build();

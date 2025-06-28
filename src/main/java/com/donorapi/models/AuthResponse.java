@@ -21,7 +21,8 @@ public class AuthResponse {
     private String email;
     private double height;
     private double weight;
-    private String lastDonation;// Dec 2024
+    private String ageGroup;
+    private String lastDonation;
     private AppointmentCard latestAppointment;
 
     public AuthResponse(String s) {

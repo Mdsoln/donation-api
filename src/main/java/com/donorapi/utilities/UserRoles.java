@@ -1,5 +1,5 @@
 package com.donorapi.utilities;
 
 public enum UserRoles {
-   DONOR, HOSPITAL, ADMINISTRATOR
+   DONOR, HOSPITAL, ADMINISTRATOR,
 }
