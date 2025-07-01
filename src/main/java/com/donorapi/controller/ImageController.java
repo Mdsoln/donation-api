@@ -24,7 +24,7 @@ public class ImageController {
     private static final String IMAGE_DIR = "uploads";
     private final ImageStorageService imageStorageService;
 
-    @GetMapping("/{filename:.+}")
+    /*@GetMapping("/{filename:.+}")
     public ResponseEntity<Resource> serveImage(@PathVariable String filename) throws IOException {
         Path imagePath = Paths.get(IMAGE_DIR).resolve(filename).normalize();
         if (!Files.exists(imagePath)) {
@@ -41,7 +41,7 @@ public class ImageController {
         return ResponseEntity.ok()
                 .contentType(MediaType.parseMediaType(contentType))
                 .body(resource);
-    }
+    }*/
 
     @PostMapping("/upload")
     public ResponseEntity<String> uploadImage(@RequestParam("file") MultipartFile file) throws IOException {

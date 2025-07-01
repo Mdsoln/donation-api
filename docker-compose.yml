@@ -11,10 +11,9 @@ services:
     volumes:
       - postgres-data:/var/lib/postgresql/data
     ports:
-      - "5432:5432"
+      - "5434:5432"
     networks:
       - donor-network
-    restart: always
 
   image-mongo:
     image: mongo:6
@@ -25,7 +24,6 @@ services:
       - "27017:27017"
     networks:
       - donor-network
-    restart: always
 
   pgadmin:
     image: dpage/pgadmin4:latest
@@ -39,7 +37,6 @@ services:
       - "8088:80"
     networks:
       - donor-network
-    restart: always
 
   backend:
     build:
@@ -57,7 +54,6 @@ services:
       - image-mongo
     networks:
       - donor-network
-    restart: always
 
 networks:
   donor-network:
