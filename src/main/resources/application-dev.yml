@@ -1,6 +1,6 @@
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5432/donation
+    url: jdbc:postgresql://database:5432/donation
     username: postgres
     password: mdsoln
     driver-class-name: org.postgresql.Driver
@@ -17,3 +17,6 @@ spring:
   sql:
     init:
       mode: never
+  data:
+    mongodb:
+      uri: mongodb://image-mongo:27017/images

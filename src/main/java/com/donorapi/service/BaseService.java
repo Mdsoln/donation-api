@@ -62,6 +62,7 @@ public class BaseService {
     private final HospitalRepository hospitalRepository;
     private final SlotsRepository slotsRepository;
     private final AppointmentRepository appointmentRepository;
+    private final ImageStorageService imageStorageService;
 
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
@@ -232,8 +233,8 @@ public class BaseService {
 
         if (request.getProfileImage() != null && !request.getProfileImage().isEmpty()) {
             validateImageType(request.getProfileImage());
-            String imageName = storeImages(request.getProfileImage());
-            donor.setImage(imageName);
+            String imageId = imageStorageService.storeImage(request.getProfileImage());
+            donor.setImage(imageId);
         }
 
         donor.setFullName(request.getFullname());
