@@ -149,7 +149,7 @@ public class BaseService {
                     final String formattedFirstName = extractFirstName(donor.getFullName());
                     final String dob = formateDateOfBirth(donor.getBirthDate());
 
-                    LocalDateTime donationDateTime = donationRepository.findTopByDonorIdOrderByDonationDateDesc(donor.getDonorId());
+                    LocalDateTime donationDateTime = donationRepository.findTopDonationDateByDonorId(donor.getDonorId());
                     LocalDate lastDonationDate = donationDateTime != null ? donationDateTime.toLocalDate() : null;
                     String lastDonation;
                     if (lastDonationDate != null) {

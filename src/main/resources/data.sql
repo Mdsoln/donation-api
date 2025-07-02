@@ -71,21 +71,19 @@ INSERT INTO appointment (id, donor_id, slot_id, status, description, blood_donat
 (2, 1, 1, 'COMPLETED', 'Urgent need', TRUE, now(), false, false, '2023-01-05'),
 (3, 1, 2, 'COMPLETED', 'First time donor', TRUE, now(), false, false, '2023-05-06'),
 (4, 1, 2, 'CANCELLED', 'Unable to attend', false, now(), false, false, '2023-05-06'),
-(4, 1, 4, 'OVERDUE', 'Unable to attend', false, now(), false, false, '2023-04-06'),
 (5, 2, 1, 'SCHEDULED', 'Routine donation', false, now(), false, false, '2025-07-05'),
 (6, 2, 1, 'COMPLETED', 'Urgent need', TRUE, now(), false, false, '2023-01-05'),
 (7, 2, 2, 'COMPLETED', 'First time donor', TRUE, now(), false, false, '2023-05-06'),
-(8, 2, 2, 'CANCELLED', 'Unable to attend', false, now(), false, false, '2023-05-06'),
 (8, 2, 2, 'OVERDUE', 'Unable to attend', false, now(), false, false, '2023-04-06');
 
 -- Insert Blood Donation details for completed appointments for each donor
-INSERT INTO blood_donations (donation_id, donor_id, appointment_id, donation_date, blood_type, volume, status) VALUES
+INSERT INTO donations (donation_id, donor_id, appointment_id, donation_date, blood_type, volume, status) VALUES
 (1, 1, 2, '2023-01-05', 'O+', 450, 'COMPLETED'),
 (2, 1, 3, '2023-05-06', 'O+', 450, 'COMPLETED'),
 (3, 2, 6, '2023-01-05', 'A+', 450, 'COMPLETED'),
 (4, 2, 7, '2023-05-06', 'A+', 450, 'COMPLETED');
 
 -- Insert Urgent Blood Request details
-INSERT INTO urgent_request (urgent_id, hospital_id, donor_id, patient_name, blood_type, notes, status, request_date, request_time, created_at) VALUES
+INSERT INTO urgent_requests (urgent_id, hospital_id, donor_id, patient_name, blood_type, notes, status, request_date, request_time, created_at) VALUES
 (1, 1, 1, 'Muddy Ramadhan', 'A+', 'Emergency surgery', 'PENDING', '2025-07-03', now(), now()),
 (2, 2, 2, 'Aisha Mussa', 'O+', 'Accident victim', 'PENDING', '2025-07-03', now(), now());

@@ -37,10 +37,10 @@ public interface DonationRepository extends JpaRepository<Donation,Integer> {
     """)
     List<HospitalDonors> findTopDonorsByHospital(@Param("hospitalId") Long hospitalId);
 
-    @Query("SELECT d.donationDate FROM Donation d " +
-            "WHERE d.appointment.donor.donorId = :donorId " +
-            "ORDER BY d.donationDate DESC")
-    LocalDateTime findTopByDonorIdOrderByDonationDateDesc(@Param("donorId") Integer donorId);
+    @Query(value = "SELECT d.donation_date FROM donations d " + "JOIN appointment a ON d.appointment_id = a.id " + "WHERE a.donor_id = :donorId " + "ORDER BY d.donation_date DESC LIMIT 1", nativeQuery = true
+    )
+    LocalDateTime findTopDonationDateByDonorId(@Param("donorId") Integer donorId);
+
 
     @Query(value = """
     SELECT TO_CHAR(d.donation_date, 'YYYY-MM') AS month, COUNT(*) AS count

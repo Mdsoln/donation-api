@@ -1,12 +1,13 @@
 spring:
   datasource:
-    url: jdbc:postgresql://database:5432/donation
+    url: jdbc:postgresql://localhost:5432/donation
     username: postgres
     password: mdsoln
     driver-class-name: org.postgresql.Driver
   jpa:
     hibernate:
       ddl-auto: update
+#    defer-datasource-initialization: true
     database: postgresql
     database-platform: org.hibernate.dialect.PostgreSQLDialect
   task:
@@ -19,4 +20,4 @@ spring:
       mode: never
   data:
     mongodb:
-      uri: mongodb://image-mongo:27017/images
+      uri: mongodb://localhost:27017/images
