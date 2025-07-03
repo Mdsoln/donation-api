@@ -182,21 +182,14 @@ public class HospitalServiceImpl {
                     }
 
                     Hospital hospital = findHospitalByUser(user);
-                    int totalAppointmentsToday = countTodayAppointments(hospital.getHospitalId());
-                    List<MonthlyDonation> monthlyDonations = getMonthlyDonationsByHospital(hospital.getHospitalId());
-                    List<FrequentDonor> frequentDonors = donationRepository.findFrequentDonorsByHospital(hospital.getHospitalId());
-                    List<UrgentRequestSummary> urgentRequests = getUrgentRequestsForHospital(hospital);
-
+                    log.debug("Found hospital: {}", hospital.getHospitalName());
                     String token = jwtService.generateToken(user);
 
                     log.info("Hospital authenticated successfully: {}", hospital.getHospitalName());
                     return new AuthHospitalResponse(
                             hospital.getHospitalName(),
                             token,
-                            totalAppointmentsToday,
-                            monthlyDonations,
-                            frequentDonors,
-                            urgentRequests
+                            hospital.getHospitalId()
                     );
                 })
                 .orElseThrow(() -> {
@@ -278,5 +271,29 @@ public class HospitalServiceImpl {
                         request.getStatus()
                 ))
                 .collect(Collectors.toList());
+    }
+
+    public List<Appointments> getAppointmentsByHospital(Long hospitalId) {
+        List<Appointment> appointments = appointmentRepository.findAppointmentsBySlot_Hospital_HospitalId(hospitalId);
+        if (appointments == null || appointments.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        return appointments.stream().map(a -> {
+            Donor donor = a.getDonor();
+            Contact contact = new Contact();
+            contact.setEmail(donor.getEmail());
+            contact.setPhone(donor.getPhone());
+
+            return new Appointments(
+                    a.getId(),
+                    donor.getFullName(),
+                    DateFormatter.formatDate(a.getAppointmentDate().atStartOfDay()),
+                    DateFormatter.formatTimeRange(a.getSlot().getStartTime(), a.getSlot().getEndTime()),
+                    a.getStatus().name(),
+                    donor.getBloodType(),
+                    contact
+            );
+        }).collect(Collectors.toList());
     }
 }

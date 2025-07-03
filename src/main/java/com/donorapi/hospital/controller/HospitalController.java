@@ -1,11 +1,8 @@
 package com.donorapi.hospital.controller;
 
 import com.donorapi.donor.models.DonationRequest;
-import com.donorapi.hospital.models.AuthHospitalResponse;
+import com.donorapi.hospital.models.*;
 import com.donorapi.models.AuthRequest;
-import com.donorapi.hospital.models.HospitalAppointment;
-import com.donorapi.hospital.models.HospitalDonors;
-import com.donorapi.hospital.models.HospitalRegistrationRequest;
 import com.donorapi.service.BaseService;
 import com.donorapi.hospital.service.HospitalServiceImpl;
 import lombok.RequiredArgsConstructor;
@@ -38,6 +35,15 @@ public class HospitalController {
             throw new IllegalArgumentException("Username and password are required");
         }
         return ResponseEntity.ok(hospitalService.authenticateHospital(request));
+    }
+
+    @GetMapping("/{hospitalId}/appointments")
+    public ResponseEntity<List<Appointments>> getAppointmentsByHospital(@PathVariable("hospitalId") Long hospitalId) {
+        if (hospitalId == null) {
+            throw new IllegalArgumentException("Hospital id cannot be null");
+        }
+        final List<Appointments> appointments = hospitalService.getAppointmentsByHospital(hospitalId);
+        return ResponseEntity.ok(appointments);
     }
 
     @PostMapping("/appointments/{appointmentId}/approval")
