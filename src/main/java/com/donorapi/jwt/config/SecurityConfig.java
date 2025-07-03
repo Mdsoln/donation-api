@@ -36,6 +36,7 @@ public class SecurityConfig {
             "/api/v1/hospital/register-hospital",
             "/api/v1/donor/login",
             "/api/v1/hospital/authenticate",
+            "/api/v1/hospital/{hospitalId}/appointments",
             "/images/**"
     };
 
@@ -62,7 +63,7 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
 
-        configuration.setAllowedOrigins(List.of("http://localhost:4200"));
+        configuration.setAllowedOrigins(List.of("http://localhost:8082"));
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("Authorization", "Cache-Control", "Content-Type"));
         configuration.setAllowCredentials(true);
